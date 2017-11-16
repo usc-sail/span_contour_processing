@@ -67,12 +67,11 @@ warning('off','MATLAB:hg:AutoSoftwareOpenGL')
 
 fprintf('Performing factor analysis.\n[')
 
-d = size(contourdata.X,2),
+d = size(contourdata.X,2);
     
 U_gfa=zeros(2*d,10);
 
-U_jaw = get_Ujaw(contourdata); size(U_jaw)
-size(U_gfa)
+U_jaw = get_Ujaw(contourdata);
 U_gfa(:,1)=U_jaw(:,1);
 
 U_tng = get_Utng(contourdata,U_jaw);
@@ -99,7 +98,7 @@ meandata=ones(size(D,1),1)*mean(D);
 Dnorm=D-meandata;
 weights = Dnorm*U_gfa;
 mean_vtshape = mean(D);
-contourdata.mean_vtshape = mean_vtshape
+contourdata.mean_vtshape = mean_vtshape;
 contourdata.U_gfa = U_gfa;
 contourdata.weights = weights;
 
@@ -107,20 +106,6 @@ figure; plot_components(contourdata);
 
 Xsim = contourdata.X;
 Ysim = contourdata.Y;
-
-figure;
-for i=1:size(weights,1)
-    
-    xysim = weights_to_vtshape(weights(i,:), mean_vtshape,  U_gfa);
-    
-    Xsim(i,:) = xysim(1:d);
-    Ysim(i,:) = xysim((d+1):end);
-    
-    plot_from_xy(D(i,:),contourdata.SectionsID,'b');
-    plot_from_xy(xysim,contourdata.SectionsID,'r'); hold off;
-    pause(0.01);
-    
-end;
 
 contourdata.Xsim = Xsim;
 contourdata.Ysim = Ysim;

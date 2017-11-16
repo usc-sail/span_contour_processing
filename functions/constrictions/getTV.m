@@ -1,147 +1,63 @@
 function getTV(configStruct)
-% GETTV - compute task variables from articulator weights
+
+% MAIN - compute task variables from articulator weights.
 % 
-% INPUT: 
-%  Variable name: configStruct
-%  Size: 1x1
-%  Class: struct
-%  Description: Fields correspond to constants and hyperparameters. 
-%  Fields: 
-%  - outPath: (string) path for saving MATLAB output
-%  - aviPath: (string) path to the AVI files
-%  - graphicsPath: (string) path to MATALB graphical output
-%  - trackPath: (string) path to segmentation results
-%  - manualAnnotationsPath: (string) path to manual annotations
-%  - timestamps_file_name_<dataset>: (string) file name with path of 
-%      timestamps file name for each data-set <dataset> of the analysis
-%  - folders_<dataset>: (cell array) string folder names which belong to 
-%      each data-set <dataset> of the analysis
-%  - tasks: (cell array) string identifiers for different tasks
-%  - FOV: (double) size of field of view in mm^2
-%  - Npix: (double) number of pixels per row/column in the imaging plane
-%  - framespersec_<dataset>: (double) frame rate of reconstructed real-time
-%      magnetic resonance imaging videos in frames per second for each 
-%      data-set <dataset> of the analysis
-%  - ncl: (double array) entries are (i) the number of constriction 
-%      locations at the hard and soft palate and (ii) the number of 
-%      constriction locations at the hypopharynx (not including the 
-%      nasopharynx).
-%  - f: (double) hyperparameter which determines the percent of data used 
-%      in locally weighted linear regression estimator of the jacobian; 
-%      multiply f by 100 to obtain the percentage
-%  - verbose: controls non-essential graphical and text output
-% 
-% FUNCTION OUTPUT:
-%  none
-% 
-% SAVED OUTPUT: 
-%  Path: configStruct.outPath
-%  File name: tv_<dataset>.mat
-%  Variable name: tv
-%  Description: Struct with fields for each subject (field name is subject ID, e.g., 'at1_rep'). The fields are structs with one field for task variables (labeled 'tv'). The 'tv' field is a cell array with four entries: 
-%  - cl: constriction location as a string: bilabial, alv, pal, softpal, Lphar, Uphar
-%  - cd: constriction degree in pixels
-%  - in: X,Y-position of the lower lip, tongue, or velum closest to the constriction location
-%  - out: X,Y-position of the upper lip, hard palate, or pharynx closest to the associated in point
-% 
-% Based on the script of Vikram Ramanarayanan (SPAN-USC, 2009).
-% 
+% Based heavily on the script of Vikram Ramanarayanan (SPAN-USC, 2009).
+%
 % Tanner Sorensen
-% Signal Analysis and Interpretation Laboratory
-% Feb. 14, 2017
+
+% Load data of contours, weights, and model.
+%load ../contourdata_gfa.mat
+%addpath ./util
+%contourdata = contourdata_gfa;
 
 outPath = configStruct.outPath;
-manualAnnotationsPath = configStruct.manualAnnotationsPath;
-folders = configStruct.folders;
-
-% Load data of contours.
 load(fullfile(outPath,'contourdata.mat'))
-nDir = length(folders);
 
-% Get factors.
-load(fullfile(outPath,'U_gfa.mat'))
+%conversion_factor = 0.0431; %used to be 0.0446
+ds = 1/6; % Make tissue-air boundary outlines denser by a factor of six.
 
-% Load constriction locations.
-load(fullfile(manualAnnotationsPath,'tvlocs.mat'))
+n=size(contourdata.X,1);
 
-for h = 1:nDir
-    participant = folders{h};
-    fprintf('Measuring task variables for subject %s\n',participant)
-    
-    % Get weights and reconstruct xy coordinates.   
-    SectionsID = contourdata.(participant).SectionsID;
-    cl = fields(tvlocs.(participant));
-    files = unique(contourdata.(participant).File);
-    nFile = length(files);
-    
-    D = zeros(100000,length(cl)+1); x1 = D; x2 = D; y1 = D; y2 = D;
-    
-    k=1;
-    
-    fprintf('[')
-    twentieths = round(linspace(1,nFile,20));
-    for i=1:nFile
-        if ismember(i,twentieths)
-            fprintf('=')
-        end
-        frame_idx = contourdata.(participant).File == files(i);
-        nFrames = sum(frame_idx);
-        x = contourdata.(participant).X(frame_idx,:);
-        y = contourdata.(participant).Y(frame_idx,:);
-        for j=1:nFrames
-            % (X,Y)-coordinates of midsagittal contours
-            %Xtngepi = x(j,SectionsID==1 | SectionsID==2);
-            %Ytngepi = y(j,SectionsID==1 | SectionsID==2);
-            Xtngepi = x(j,SectionsID==2);
-            Ytngepi = y(j,SectionsID==2);
-            Xul = x(j,SectionsID==15);
-            Yul = y(j,SectionsID==15);
-            Xll = x(j,SectionsID==4);
-            Yll = y(j,SectionsID==4);
-            Xvelum = x(j,SectionsID==12);
-            Yvelum = y(j,SectionsID==12);
-            
-            [D(k,1),x1(k,1),y1(k,1),x2(k,1),y2(k,1)] = getCD(Xul,Yul,Xll,Yll); % lower lip against upper lip
-            for ell=1:length(cl)
-                if strcmp(cl{ell},'pharU') % velum against nasopharynx (i.e., 'pharU')
-                    sections_match = ismember(SectionsID, tvlocs.(participant).(cl{ell}).aux);
-                    nodes_match = sort([tvlocs.(participant).(cl{ell}).start,...
-                        tvlocs.(participant).(cl{ell}).stop]);
-                    nodes_match = nodes_match(1):nodes_match(2);
-                    Xcl = contourdata.(participant).X(j,sections_match);
-                    Xcl = Xcl(nodes_match);
-                    Ycl = contourdata.(participant).Y(j,sections_match);
-                    Ycl = Ycl(nodes_match);
-                    [D(k,ell+1),x1(k,ell+1),y1(k,ell+1),x2(k,ell+1),y2(k,ell+1)] = getCD(Xcl,Ycl,Xvelum,Yvelum);
-                else % tongue against pharynx or palate
-                    sections_match = ismember(SectionsID, tvlocs.(participant).(cl{ell}).aux);
-                    nodes_match = sort([tvlocs.(participant).(cl{ell}).start,...
-                        tvlocs.(participant).(cl{ell}).stop]);
-                    nodes_match = nodes_match(1):nodes_match(2);
-                    Xcl = contourdata.(participant).X(j,sections_match);
-                    Xcl = Xcl(nodes_match);
-                    Ycl = contourdata.(participant).Y(j,sections_match);
-                    Ycl = Ycl(nodes_match);
-                    [D(k,ell+1),x1(k,ell+1),y1(k,ell+1),x2(k,ell+1),y2(k,ell+1)] = getCD(Xcl,Ycl,Xtngepi,Ytngepi);
-                end
-            end
-            
-            k=k+1;
-        end
-    end
-    fprintf(']\n')
-    
-    D(k:end,:)=[]; x1(k:end,:)=[]; y1(k:end,:)=[]; x2(k:end,:)=[]; y2(k:end,:)=[];
-    
-    cl = [{'bilabial'}, fields(tvlocs.(participant))'];
-    for i=1:size(D,2)
-        tv.(participant).tv{i}.cl=cl{i};
-        tv.(participant).tv{i}.cd=D(:,i);
-        tv.(participant).tv{i}.in=[x1(:,i) y1(:,i)]; 
-        tv.(participant).tv{i}.out=[x2(:,i) y2(:,i)];
-    end
+LA=zeros(n,1); ulx=LA; uly=LA; llx=LA; lly=LA;
+VEL=LA; velumx1=LA; velumy1=LA; pharynxx1=LA; pharynxy1=LA;
+alveolarCD=LA; alveolarx=LA; alveolary=LA; tonguex2=LA; tonguey2=LA;
+palatalCD=LA; palatalx=LA; palataly=LA; tonguex3=LA; tonguey3=LA;
+velarCD=LA; velumx2=LA; velumy2=LA; tonguex1=LA; tonguey1=LA;
+pharyngealCD=LA; pharynxx2=LA; pharynxy2=LA; tonguex4=LA; tonguey4=LA; 
+
+files = unique(contourdata.File);
+nFiles = length(files);
+k=1;
+for i=1:nFiles
+     frames=contourdata.Frames(contourdata.File==i);
+         for j=1:length(frames)
+%         % OPTIONAL: Keep hard palate at its mean value
+%         %contourdata.weights(contourdata.File == files(i),11:12)=0; 
+
+        [X,Y,Xul,Yul,Xll,Yll,Xtongue,Ytongue,Xalveolar,...
+            Yalveolar,Xpalatal,Ypalatal,Xvelum,Yvelum,...
+            Xvelar,Yvelar,Xphar,Yphar] = vtSeg(contourdata,...
+            i,frames(j),ds);
+        
+        [LA(k),ulx(k),uly(k),llx(k),lly(k)] = getLA(Xul,Yul,Xll,Yll);
+        [VEL(k),velumx1(k),velumy1(k),pharynxx1(k),pharynxy1(k)] = getVEL(Xvelum,Yvelum,Xphar,Yphar);
+        [alveolarCD(k),alveolarx(k),alveolary(k),tonguex2(k),tonguey2(k)] = getAlveolarCD(Xalveolar,Yalveolar,Xtongue,Ytongue);
+        [palatalCD(k),palatalx(k),palataly(k),tonguex3(k),tonguey3(k)] = getPalatalCD(Xpalatal,Ypalatal,Xtongue,Ytongue);
+        [velarCD(k),velumx2(k),velumy2(k),tonguex1(k),tonguey1(k)] = getVelarCD(Xvelar,Yvelar,Xtongue,Ytongue);
+        [pharyngealCD(k),pharynxx2(k),pharynxy2(k),tonguex4(k),tonguey4(k)] = getPharyngealCD(Xphar,Yphar,Xtongue,Ytongue);
+        
+        k=k+1;
+%         end;
+     end
+    disp(['Getting (original) TVs file ' num2str(i) ' of ' num2str(nFiles)])
 end
+%TV = [LA' alveolarCD' palatalCD' velarCD' pharyngealCD' VEL'];
+contourdata.tv{1}.cd=LA; contourdata.tv{1}.in=[llx lly]; contourdata.tv{1}.out=[ulx uly];
+contourdata.tv{2}.cd=VEL; contourdata.tv{2}.in=[velumx1 velumy1]; contourdata.tv{2}.out=[pharynxx1 pharynxy1];
+contourdata.tv{3}.cd=alveolarCD; contourdata.tv{3}.in=[tonguex2 tonguey2]; contourdata.tv{3}.out=[alveolarx alveolary];
+contourdata.tv{4}.cd=palatalCD; contourdata.tv{4}.in=[tonguex3 tonguey3]; contourdata.tv{4}.out=[palatalx palataly];
+contourdata.tv{5}.cd=velarCD; contourdata.tv{5}.in=[tonguex1 tonguey1]; contourdata.tv{5}.out=[velumx2 velumy2];
+contourdata.tv{6}.cd=pharyngealCD; contourdata.tv{6}.in=[tonguex4 tonguey4]; contourdata.tv{6}.out=[pharynxx2 pharynxy2];
 
-save(fullfile(outPath,'tv.mat'),'tv')
-
-end
+save(fullfile(configStruct.outPath,'contourdata.mat'),'contourdata')

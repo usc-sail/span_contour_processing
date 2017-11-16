@@ -2,9 +2,9 @@
 % results in configStruct.datPath and saving the MAT file at the location 
 % configStruct.outPath.
 % 
-% Tanner Sorensen
-% Signal Analysis and Interpretation Laboratory
-% Feb. 14, 2017
+% Asterios Toutios (base on code by Tanner Sorensen)
+% University of Southern California
+% Nov 15, 2017
 
 addpath(genpath('functions'))
 % mkdir mat
@@ -20,13 +20,11 @@ make_contour_data(configStruct)
 % Perform factor analysis of the contours in the file ./mat/contourdata.mat
 get_Ugfa(configStruct)
 
-waitfor(tvlocs(configStruct))
-
 % measure task variables
 getTV(configStruct)
 
-% plot task variable figure
-plotTV(configStruct)
-
 % measure task variables after recon
 getTVsim(configStruct)
+
+% get locally linear map
+get_map(configStruct)

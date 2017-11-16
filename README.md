@@ -1,29 +1,17 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+(Written by Asterios, Nov 15 2017)
 
-### What is this repository for? ###
+### Attention ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+The code here will need some testing in an actual articulatory synthesis setup to make absolutely sure everything is correct.
 
-### How do I get set up? ###
+Some more cleaning can be done, but at this point I consider it optional (we can deal with it if we publish this code).
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Instructions ###
 
-### Contribution guidelines ###
+* Take the tracking mat files of a speaker and put it in a directory (This will be your trackPath)
+* Open a directory to store results (outPath)
+* Edit accordingly lines 43-44 of config.m
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+* Run wrap_build_model. The result will be a contourdata.mat file in outPath

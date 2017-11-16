@@ -41,11 +41,13 @@ function configStruct = config
 
 % paths
 outPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/';
+trackPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/track/';
+
+aviPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/avi/';
 graphicsPath = outPath;
 manualAnnotationsPath = outPath;
 timestamps_file_name =[outPath,'timestamps_rep1.xlsx'];
-aviPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/avi/';
-trackPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/track/';
+
 
 %manualAnnotationsPath = '/Users/toutios/OneDrive - University of Southern California/Code/span_contour_processing/manual_annotations';
 

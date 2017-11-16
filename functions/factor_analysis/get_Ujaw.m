@@ -67,8 +67,6 @@ N = size(D,1);
 % Covariance matrix
 R = Dnorm'*Dnorm/N;
 
-size(R)
-
 % GFA Overall
 
 t1=U_jawraw(:,1);

@@ -69,7 +69,7 @@ Dnorm(:,~ismember(SecID2,vtsection))=0;
 N= size(D,1);
 
 % Covariance matrix
-R = Dnorm'*Dnorm/N
+R = Dnorm'*Dnorm/N;
 
 % GFA Overall
 
