@@ -87,6 +87,8 @@ for i=1:nFile
     
     for j=1:nFrame
         
+        try
+        
         segment = file.trackdata{j}.contours.segment;
         
         segmentStart = 0;
@@ -113,6 +115,12 @@ for i=1:nFile
             videoFrames(ell) = file.trackdata{j}.frameNo;
             files(ell) = i;
         end
+        
+        catch
+            
+            warning('lost frame');
+            
+        end;
         
         ell=ell+1;
     end

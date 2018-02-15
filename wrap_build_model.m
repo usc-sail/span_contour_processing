@@ -28,3 +28,24 @@ getTVsim(configStruct)
 
 % get locally linear map
 get_map(configStruct)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear;
+configStruct = config_cg;
+
+% The call to make_contour_data below generates the file 
+% ./mat/contourdata.mat
+make_contour_data(configStruct)
+
+% Perform factor analysis of the contours in the file ./mat/contourdata.mat
+get_Ugfa(configStruct)
+
+% measure task variables
+getTV(configStruct)
+
+% measure task variables after recon
+getTVsim(configStruct)
+
+% get locally linear map
+get_map(configStruct)

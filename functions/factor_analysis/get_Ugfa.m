@@ -104,8 +104,16 @@ contourdata.weights = weights;
 
 figure; plot_components(contourdata);
 
-Xsim = contourdata.X;
-Ysim = contourdata.Y;
+n = size(weights,1);
+
+xy_data = D;
+
+for i=1:n
+    xy_data(i,:) = weights_to_vtshape(weights(i,:), mean_vtshape,  U_gfa);
+end;
+
+Xsim = xy_data(:,1:d);
+Ysim = xy_data(:,(d+1):end);
 
 contourdata.Xsim = Xsim;
 contourdata.Ysim = Ysim;

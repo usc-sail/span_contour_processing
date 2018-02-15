@@ -26,11 +26,23 @@ nz = 6;
 nObs = length(contourdata.tvsim{1}.cd);
 
 z=NaN(nObs,nz);
+%flag = ones(nObs,1);
 for j=1:nz
     z(:,j) = contourdata.tvsim{j}.cd;
+%     for i=1:nObs
+%         if z(i,j) == 0
+%             flag(i) = 0; continue;
+%         end;
+%     end;
 end
 w=contourdata.weights(:,1:nf);
+
+
+%z = z(flag > 0,:);
+%w = w(flag > 0,:);
+
 [dzdt,dwdt] = getGrad(z,w,frameRate,contourdata.File);
+
 
 disp('Making forward map')
 

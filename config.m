@@ -40,10 +40,10 @@ function configStruct = config
 % Nov 15, 2017
 
 % paths
-outPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/';
-trackPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/track/';
+outPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_NSF_Segment/cs/model';
+trackPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_NSF_Segment/cs/results';
 
-aviPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_JE_Forward_Map/je/avi/';
+aviPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_NSF_Segment/cs/avi/';
 graphicsPath = outPath;
 manualAnnotationsPath = outPath;
 timestamps_file_name =[outPath,'timestamps_rep1.xlsx'];

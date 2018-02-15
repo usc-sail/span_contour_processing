@@ -20,7 +20,7 @@ close all;
 
 for j=1:10;  % component under examination
     
-    parameters=zeros(10,1);
+    parameters=zeros(1,10);
     subplot(2,5,j);
     
     i=components(j);
