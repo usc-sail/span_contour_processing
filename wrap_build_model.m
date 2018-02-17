@@ -7,45 +7,35 @@
 % Nov 15, 2017
 
 addpath(genpath('functions'))
-% mkdir mat
-% mkdir graphics
-% mkdir manual_annotations
 
-configStruct = config;
+% configure constant parameters of the analysis
+config_struct = config;
 
-% The call to make_contour_data below generates the file 
-% ./mat/contourdata.mat
-make_contour_data(configStruct)
+% verify that the directory containing segmentation results exists
+if ~exist(config_struct.track_path,'dir')
+    warning(['The directory containing segmentation results does not exist. ',...
+        'Create directory\n  %s\nor change the directory name in the file config.m'],...
+        config_struct.trackPath)
+end
 
-% Perform factor analysis of the contours in the file ./mat/contourdata.mat
-get_Ugfa(configStruct)
+% make directory for outputs, if the directory does not exist
+if ~exist(config_struct.out_path,'dir')
+    mkdir(config_struct.out_path)
+end
 
-% measure task variables
-getTV(configStruct)
-
-% measure task variables after recon
-getTVsim(configStruct)
-
-% get locally linear map
-get_map(configStruct)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-clear;
-configStruct = config_cg;
-
-% The call to make_contour_data below generates the file 
-% ./mat/contourdata.mat
-make_contour_data(configStruct)
+% The call to make_contour_data below generates the file contourdata.mat in
+% the directory configuStruct.outpath
+make_contour_data(config_struct)
 
 % Perform factor analysis of the contours in the file ./mat/contourdata.mat
-get_Ugfa(configStruct)
+variant_switch = 'sorensen2018';
+get_Ugfa(config_struct,variant_switch)
 
 % measure task variables
-getTV(configStruct)
+get_tv(config_struct,false)
 
 % measure task variables after recon
-getTVsim(configStruct)
+get_tv(config_struct,true)
 
 % get locally linear map
-get_map(configStruct)
+get_map(config_struct)

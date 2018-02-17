@@ -12,9 +12,9 @@ Y2=Y(ismember(sectionID,7:10));
 X3=X(ismember(sectionID,11:15));
 Y3=Y(ismember(sectionID,11:15));
 
-plot(X1,Y1,'LineWidth',1,'Color',color); hold on
-plot(X2,Y2,'LineWidth',1,'Color',color);
-plot(X3,Y3,'LineWidth',1,'Color',color); hold off
+plot(X1,Y1,color,'LineWidth',2);hold on;
+plot(X2,Y2,color,'LineWidth',2);
+plot(X3,Y3,color,'LineWidth',2);%hold off;
 
 axis equal;
 

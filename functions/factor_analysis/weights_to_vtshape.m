@@ -1,4 +1,4 @@
-function xy_data = weights_to_vtshape(weights, mean_vtshape,  U)
+function xy_data = weights_to_vtshape(weights, mean_vtshape,  U, variant_switch)
 
 % xy_data=mean_vtshape;
 % 
@@ -8,7 +8,11 @@ function xy_data = weights_to_vtshape(weights, mean_vtshape,  U)
 %     
 % end;
 
-xy_data = mean_vtshape + weights*pinv(U(:,1:length(weights)));
+if strcmp(variant_switch,'toutios2015factor')
+    xy_data = mean_vtshape + weights*pinv(U(:,1:length(weights)));
+else
+    xy_data = mean_vtshape + weights*U(:,1:length(weights))';
+end
 
 
 

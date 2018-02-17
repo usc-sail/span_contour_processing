@@ -1,11 +1,11 @@
-function make_contour_data(configStruct)
+function make_contour_data(config_struct)
 % MAKE_CONTOUR_DATA - make all the track files in configStruct.pathIn into
 % a structured array CONTOURDATA saved to file CONTOURDATA_ORIGINAL.mat in
 % configStruct.pathOut. configStruct.pathIn is the parent of the
 % directories whose names are in the configStruct.folders cell array.
 %
 % INPUT:
-%  Variable name: configStruct
+%  Variable name: config_struct
 %  Size: 1x1
 %  Class: struct
 %  Description: Fields correspond to constants and hyperparameters.
@@ -36,9 +36,9 @@ function make_contour_data(configStruct)
 %  none
 %
 % SAVED OUTPUT:
-%  Path: configStruct.pathOut
+%  Path: config_struct.pathOut
 %  File name: contourdata.mat
-%  Variable name: contourdata
+%  Variable name: contour_data
 %  Size: 1x1
 %  Class: struct
 %  Description: Struct with fields for each subject (field name is subject
@@ -64,63 +64,61 @@ function make_contour_data(configStruct)
 % Signal Analysis and Interpretation Laboratory
 % Feb. 14, 2017
 
-pathIn = configStruct.trackPath;
-pathOut = configStruct.outPath;
+path_in = config_struct.track_path;
+path_out = config_struct.out_path;
 
-fprintf('Making contourdata\n')
-fileFormat = '*.mat';  % file name pattern
+fprintf('Making contour_data\n')
+file_format = '*.mat';  % file name pattern
 
-fileList = dir(fullfile(pathIn,fileFormat));
-fileList = {fileList.name};
-nFile = length(fileList);
+file_list = dir(fullfile(path_in,file_format));
+file_list = {file_list.name};
+n_file = length(file_list);
 
 ell=1;
 fprintf('[')
-twentieths = round(linspace(1,nFile,20));
-for i=1:nFile
+twentieths = round(linspace(1,n_file,20));
+for i=1:n_file
     if ismember(i,twentieths)
         fprintf('=')
     end
     
-    file = load(fullfile(pathIn,fileList{i}));
-    nFrame = length(file.trackdata);
+    file = load(fullfile(path_in,file_list{i}));
+    n_frame = length(file.trackdata);
     
-    for j=1:nFrame
+    for j=1:n_frame
         
         try
-        
-        segment = file.trackdata{j}.contours.segment;
-        
-        segmentStart = 0;
-        sectionsID = [];
-        y = [];
-        for k=1:(size(segment,2)-1)
-            sectionsID   = cat(1,sectionsID,segmentStart+segment{k}.i);
-            segmentStart = segmentStart+max(segment{k}.i);
-            v            = segment{k}.v;
-            y            = cat(1,y,[v(:,1),v(:,2)]);
-        end
-        
-        if i==1 && j==1
-            lenInit = 100000;
-            frames = zeros(lenInit,1);
-            videoFrames = zeros(lenInit,1);
-            files = zeros(lenInit,1);
-            X=NaN(lenInit,size(y,1));
-            Y=NaN(lenInit,size(y,1));
-        else
-            X(ell,:) = y(:,1)';
-            Y(ell,:) = y(:,2)';
-            frames(ell) = j;
-            videoFrames(ell) = file.trackdata{j}.frameNo;
-            files(ell) = i;
-        end
-        
+            
+            segment = file.trackdata{j}.contours.segment;
+
+            segment_start = 0;
+            sections_id = [];
+            y = [];
+            for k=1:(size(segment,2)-1)
+                sections_id   = cat(1,sections_id,segment_start+segment{k}.i);
+                segment_start = segment_start+max(segment{k}.i);
+                v            = segment{k}.v;
+                y            = cat(1,y,[v(:,1),v(:,2)]);
+            end
+
+            if i==1 && j==1
+                len_init = 100000;
+                frames = zeros(len_init,1);
+                video_frames = zeros(len_init,1);
+                files = zeros(len_init,1);
+                X=NaN(len_init,size(y,1));
+                Y=NaN(len_init,size(y,1));
+            else
+                X(ell,:) = y(:,1)';
+                Y(ell,:) = y(:,2)';
+                frames(ell) = j;
+                video_frames(ell) = file.trackdata{j}.frameNo;
+                files(ell) = i;
+            end
+            
         catch
-            
             warning('lost frame');
-            
-        end;
+        end
         
         ell=ell+1;
     end
@@ -132,13 +130,13 @@ X(ii,:)=[];
 Y(ii,:)=[];
 files(ii)=[];
 frames(ii)=[];
-videoFrames(ii)=[];
-X(:,sectionsID==11) = repmat(mean(X(:,sectionsID==11),1),length(files),1);
-Y(:,sectionsID==11) = repmat(mean(Y(:,sectionsID==11),1),length(files),1);
+video_frames(ii)=[];
+X(:,sections_id==11) = repmat(mean(X(:,sections_id==11),1),length(files),1);
+Y(:,sections_id==11) = repmat(mean(Y(:,sections_id==11),1),length(files),1);
 
-contourdata = struct('X',X,'Y',Y,...
-    'File',files,'fl',{fileList},'SectionsID',sectionsID','Frames',frames,'VideoFrames',videoFrames);
+contour_data = struct('X',X,'Y',Y,...
+    'files',files,'file_list',{file_list},'sections_id',sections_id','frames',frames,'video_frames',video_frames);
 
-save(fullfile(pathOut,'contourdata.mat'),'contourdata')
+save(fullfile(path_out,'contour_data.mat'),'contour_data')
 
 end

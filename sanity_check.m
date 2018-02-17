@@ -7,7 +7,7 @@ load(fullfile(outPath,'contourdata.mat'))
 
 
 figure;
-for i=1000:1200
+for i=1:100
     
     plot_from_xy([contourdata.X(i,:),contourdata.Y(i,:)],contourdata.SectionsID,'b');
     plot_from_xy([contourdata.Xsim(i,:),contourdata.Ysim(i,:)],contourdata.SectionsID,'r'); 
@@ -24,4 +24,3 @@ for i=1000:1200
     pause(0.1); hold off;
     
 end;
-    

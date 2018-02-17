@@ -1,4 +1,4 @@
-function [U,V,varpercent,m]=pca(X,L)
+function [U,V,varpercent,m]=span_pca(X,L)
   
   % Performs PCA on dataset X, outputing L components. X is the table of
   % components (each column a component), V is the eigenvalues, and

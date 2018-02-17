@@ -14,34 +14,33 @@ function get_map(configStruct)
 % University of Southern California
 
 % load task variables and weights for subjects SUBJ
-pathOut = configStruct.outPath;
-frameRate = configStruct.framespersec;
-verbose = 1;
+out_path = configStruct.out_path;
+frames_per_sec = configStruct.frames_per_sec;
 crit = 0.5;
 
-load(fullfile(pathOut, '/contourdata.mat'))
+load(fullfile(out_path,'contour_data.mat'))
 
 nf = 8;
 nz = 6;
-nObs = length(contourdata.tvsim{1}.cd);
+nObs = length(contour_data.tvsim{1}.cd);
 
 z=NaN(nObs,nz);
 %flag = ones(nObs,1);
 for j=1:nz
-    z(:,j) = contourdata.tvsim{j}.cd;
+    z(:,j) = contour_data.tvsim{j}.cd;
 %     for i=1:nObs
 %         if z(i,j) == 0
 %             flag(i) = 0; continue;
 %         end;
 %     end;
 end
-w=contourdata.weights(:,1:nf);
+w=contour_data.weights(:,1:nf);
 
 
 %z = z(flag > 0,:);
 %w = w(flag > 0,:);
 
-[dzdt,dwdt] = getGrad(z,w,frameRate,contourdata.File);
+[dzdt,dwdt] = getGrad(z,w,frames_per_sec,contour_data.files);
 
 
 disp('Making forward map')
@@ -73,10 +72,10 @@ while ~isempty(lib)
     
     if linear
         % add center and jac to containers
-        [centers,fwd,jac,jacDot,clusterInd,linInd] = addCluster(curCluster,dzdt,dwdt,z,w,dzdw,resid,centers,fwd,jac,jacDot,clusterInd,linInd,linear,verbose);
+        [centers,fwd,jac,jacDot,clusterInd,linInd] = addCluster(curCluster,dzdt,dwdt,z,w,dzdw,resid,centers,fwd,jac,jacDot,clusterInd,linInd,linear);
     else
         % break cluster into k smaller clusters
-        [lib,centers,fwd,jac,jacDot,clusterInd,linInd] = breakCluster(curCluster,lib,dzdt,dwdt,z,w,k,minSize,centers,fwd,jac,jacDot,clusterInd,dzdw,resid,linInd,linear,verbose);
+        [lib,centers,fwd,jac,jacDot,clusterInd,linInd] = breakCluster(curCluster,lib,dzdt,dwdt,z,w,k,minSize,centers,fwd,jac,jacDot,clusterInd,dzdw,resid,linInd,linear);
     end
 end
 
@@ -89,17 +88,17 @@ fprintf(1,['\n*****\nNo. observed data-points: %d\n',...
     'Percent of clusters which are linear: %.0f%%\n*****\n'],...
     Nobs, crit, minSize, size(centers,1), size(centers,1)/Nobs, 100*sum(linInd)/size(centers,1));
 
-contourdata.centers = centers;
-contourdata.fwd = fwd;
-contourdata.jac = jac;
-contourdata.jacDot = jacDot;
-contourdata.Nobs = Nobs;
-contourdata.crit = crit;
-contourdata.minSize = minSize;
-contourdata.nClusters = size(centers,1);
-contourdata.linear = linInd;
-contourdata.nLinClusters = sum(linInd);
+contour_data.centers = centers;
+contour_data.fwd = fwd;
+contour_data.jac = jac;
+contour_data.jacDot = jacDot;
+contour_data.Nobs = Nobs;
+contour_data.crit = crit;
+contour_data.minSize = minSize;
+contour_data.nClusters = size(centers,1);
+contour_data.linear = linInd;
+contour_data.nLinClusters = sum(linInd);
 
-save(fullfile(configStruct.outPath,'contourdata.mat'),'contourdata')
+save(fullfile(configStruct.out_path,'contour_data.mat'),'contour_data')
 
 end

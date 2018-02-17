@@ -1,51 +1,46 @@
-function [X,Y,Xul,Yul,Xll,Yll,Xtongue,Ytongue,Xalveolar,...
+function [Xul,Yul,Xll,Yll,Xtongue,Ytongue,Xalveolar,...
     Yalveolar,Xpalatal,Ypalatal,Xvelum,Yvelum,Xvelar,...
-    Yvelar,Xphar,Yphar,Xepig,Yepig] = vtSeg(contourdata,fileName, frameNumber,ds)
+    Yvelar,Xphar,Yphar,Xepig,Yepig] = vtSeg(contourdata, file_name, frame_number, ds, sim_switch)
     
-%     xy_data = weights_to_vtshape(contourdata.weights(...
-%         contourdata.File == fileNumber & contourdata.Frames == frameNumber,:),...
-%         mean_vtshape, U);
-%     X = xy_data(1:length(xy_data)/2);
-%     Y = xy_data(length(xy_data)/2+1:end);
-
-    X=contourdata.X(...
-         (contourdata.File == fileName & contourdata.Frames == frameNumber)',:);
-    Y=contourdata.Y(...
-         (contourdata.File == fileName & contourdata.Frames == frameNumber)',:);
+    if ~sim_switch
+        X=contourdata.X((contourdata.files == file_name & contourdata.frames == frame_number)',:);
+        Y=contourdata.Y((contourdata.files == file_name & contourdata.frames == frame_number)',:);
+    else
+        X=contourdata.Xsim((contourdata.files == file_name & contourdata.frames == frame_number)',:);
+        Y=contourdata.Ysim((contourdata.files == file_name & contourdata.frames == frame_number)',:);
+    end
     
-
-   % X=contourdata.X; Y=contourdata.Y;
-
     % Lips
-    Xul = X(ismember(contourdata.SectionsID,15));
-    Yul = Y(ismember(contourdata.SectionsID,15));
-    Xll = X(ismember(contourdata.SectionsID,4));
-    Yll = Y(ismember(contourdata.SectionsID,4));
+    Xul = X(ismember(contourdata.sections_id,15));
+    Yul = Y(ismember(contourdata.sections_id,15));
+    Xll = X(ismember(contourdata.sections_id,4));
+    Yll = Y(ismember(contourdata.sections_id,4));
     Xul = interp1(Xul,1:ds:length(Xul));
     Yul = interp1(Yul,1:ds:length(Yul));
     Xll = interp1(Xll,1:ds:length(Xll));
     Yll = interp1(Yll,1:ds:length(Yll));
     
     % Tongue
-    Xtongue = X(ismember(contourdata.SectionsID,2));
-    Ytongue = Y(ismember(contourdata.SectionsID,2));
+    Xtongue = X(ismember(contourdata.sections_id,2));
+    Ytongue = Y(ismember(contourdata.sections_id,2));
     Xtongue=interp1(Xtongue,1:ds:length(Xtongue));
     Ytongue=interp1(Ytongue,1:ds:length(Ytongue));
     
-    Xepig = X(ismember(contourdata.SectionsID,1));
-    Yepig = Y(ismember(contourdata.SectionsID,1));
+    % Epiglottis
+    Xepig = X(ismember(contourdata.sections_id,1));
+    Yepig = Y(ismember(contourdata.sections_id,1));
     Xepig=interp1(Xepig,1:ds:length(Xepig));
     Yepig=interp1(Yepig,1:ds:length(Yepig));
     
     % Palate
-    Xalveolar = X(ismember(contourdata.SectionsID,11));
-    Yalveolar = Y(ismember(contourdata.SectionsID,11));
-    Xpalatal =  X(ismember(contourdata.SectionsID,11));
-    Ypalatal =  Y(ismember(contourdata.SectionsID,11));
-    Xvelum = X(ismember(contourdata.SectionsID,12));
-    Yvelum = Y(ismember(contourdata.SectionsID,12));
-    Xphar = X(ismember(contourdata.SectionsID,[7 8]));
-    Yphar = Y(ismember(contourdata.SectionsID,[7 8]));
+    Xalveolar = X(ismember(contourdata.sections_id,11));
+    Yalveolar = Y(ismember(contourdata.sections_id,11));
+    Xpalatal =  X(ismember(contourdata.sections_id,11));
+    Ypalatal =  Y(ismember(contourdata.sections_id,11));
+    Xvelum = X(ismember(contourdata.sections_id,12));
+    Yvelum = Y(ismember(contourdata.sections_id,12));
+    Xphar = X(ismember(contourdata.sections_id,[7 8]));
+    Yphar = Y(ismember(contourdata.sections_id,[7 8]));
     Xalveolar = interp1(Xalveolar,1:ds:length(Xalveolar));
     Yalveolar = interp1(Yalveolar,1:ds:length(Yalveolar));
     Xpalatal = interp1(Xpalatal,1:ds:length(Xpalatal));

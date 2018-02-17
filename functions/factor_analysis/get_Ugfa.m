@@ -1,6 +1,6 @@
-function get_Ugfa(configStruct)
+function get_Ugfa(configStruct,varargin)
 % GET_UGFA - extract factors of vocal tract shape the contours in the file
-% contourdata.mat
+% contour_data.mat
 % 
 % INPUT:
 %  Variable name: configStruct
@@ -60,64 +60,77 @@ function get_Ugfa(configStruct)
 % University of Southern California
 % Nov 15, 2017
 
-load(fullfile(configStruct.outPath,'contourdata.mat'))
+if nargin<2
+    variant_switch = 'toutios2015factor';
+elseif nargin==2
+    variant_switch = varargin{1};
+else
+    warning(['Function get_Ugfa.m was called with %d input arguments,' ...
+        ' but requires 1 (optionally 2)'],nargin)
+end
 
-warning('off','stats:pca:ColRankDefX')
-warning('off','MATLAB:hg:AutoSoftwareOpenGL')
+load(fullfile(configStruct.out_path,'contour_data.mat'))
 
-fprintf('Performing factor analysis.\n[')
+% warning('off','stats:pca:ColRankDefX')
+% warning('off','MATLAB:hg:AutoSoftwareOpenGL')
 
-d = size(contourdata.X,2);
+disp('Performing factor analysis.')
+
+d = size(contour_data.X,2);
     
 U_gfa=zeros(2*d,10);
 
-U_jaw = get_Ujaw(contourdata);
+U_jaw = get_Ujaw(contour_data,variant_switch);
 U_gfa(:,1)=U_jaw(:,1);
 
-U_tng = get_Utng(contourdata,U_jaw);
+U_tng = get_Utng(contour_data,U_jaw(:,1),variant_switch);
 U_gfa(:,2:5)=U_tng(:,1:4);
 
-U_lip = get_Ulip(contourdata,U_jaw);
+U_lip = get_Ulip(contour_data,U_jaw(:,1),variant_switch);
 U_gfa(:,6:7)=U_lip(:,1:2);
 
-U_vel = get_Uvel(contourdata);
+U_vel = get_Uvel(contour_data,U_jaw(:,1),variant_switch);
 U_gfa(:,8)=U_vel(:,1);
 
-U_lar = get_Ular(contourdata);
+U_lar = get_Ular(contour_data,U_jaw(:,1),variant_switch);
 U_gfa(:,9:10)=U_lar(:,1:2);
 
-%U_head = get_Uhead(contourdata);
+%U_head = get_Uhead(contour_data);
 %U_gfa(:,11:12)=U_head(:,1:2);
 
 
-warning('on','stats:pca:ColRankDefX')
-warning('on','MATLAB:hg:AutoSoftwareOpenGL')
+% warning('on','stats:pca:ColRankDefX')
+% warning('on','MATLAB:hg:AutoSoftwareOpenGL')
 
-D = [contourdata.X,contourdata.Y];
-meandata=ones(size(D,1),1)*mean(D);
-Dnorm=D-meandata;
-weights = Dnorm*U_gfa;
-mean_vtshape = mean(D);
-contourdata.mean_vtshape = mean_vtshape;
-contourdata.U_gfa = U_gfa;
-contourdata.weights = weights;
+D = [contour_data.X,contour_data.Y];
+mean_data=ones(size(D,1),1)*mean(D);
+Dnorm=D-mean_data;
+if strcmp(variant_switch,'toutios2015factor')
+    weights = Dnorm*U_gfa;
+else
+    weights = Dnorm*pinv(U_gfa');
+end
+mean_vt_shape = mean(D);
+contour_data.mean_vt_shape = mean_vt_shape;
+contour_data.U_gfa = U_gfa;
+contour_data.weights = weights;
 
-figure; plot_components(contourdata);
+figure; plot_components(contour_data, variant_switch);
 
 n = size(weights,1);
 
 xy_data = D;
 
 for i=1:n
-    xy_data(i,:) = weights_to_vtshape(weights(i,:), mean_vtshape,  U_gfa);
+    xy_data(i,:) = weights_to_vtshape(weights(i,:), mean_vt_shape,  U_gfa, variant_switch);
 end;
 
 Xsim = xy_data(:,1:d);
 Ysim = xy_data(:,(d+1):end);
 
-contourdata.Xsim = Xsim;
-contourdata.Ysim = Ysim;
+contour_data.Xsim = Xsim;
+contour_data.Ysim = Ysim;
 
-save(fullfile(configStruct.outPath,'contourdata.mat'),'contourdata')
+save(fullfile(configStruct.out_path,'contour_data.mat'),'contour_data')
 
 end

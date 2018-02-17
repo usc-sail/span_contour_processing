@@ -40,40 +40,29 @@ function configStruct = config
 % Nov 15, 2017
 
 % paths
-outPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_NSF_Segment/cs/model';
-trackPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_NSF_Segment/cs/results';
+out_path = '/home/tsorense/spring2018/ars_build_model/mat';
+track_path = '/home/tsorense/spring2018/segmentation_results/ac2_var/track_files';
 
-aviPath = '/Users/toutios/OneDrive - University of Southern California/Experiments/2017_NSF_Segment/cs/avi/';
-graphicsPath = outPath;
-manualAnnotationsPath = outPath;
-timestamps_file_name =[outPath,'timestamps_rep1.xlsx'];
+% spatial parameters
+fov = 200; % 200 mm^2 field of view 
+n_pix = 84; % 68^2 total pixels 
+           % in-plane spatial resolution is FOV/Npix
 
+% temporal parameters
+tr_per_image = 2;
+tr = 0.006004;
+frames_per_sec = 1/(tr_per_image*tr);
 
-%manualAnnotationsPath = '/Users/toutios/OneDrive - University of Southern California/Code/span_contour_processing/manual_annotations';
-
-% timestamps file name
-%timestamps_file_name = '/Users/toutios/OneDrive - University of Southern California/Code/span_contour_processing/manual_annotations/timestamps_rep1.xlsx';
-
-% array constants
-%folders = {'je'};
-
-% fixed parameters
-FOV = 200; % 200 mm^2 field of view 
-Npix = 84; % 68^2 total pixels
-%spatRes = FOV/Npix; % spatial resolution
-framespersec = 1/(2*0.006004);
-ncl = [3 1];
+% % number of constriction locations
+% ncl = [3 1];
 
 % control printed output
-verbose = false;
+% verbose = false;
 
 % make the struct object
-configStruct = struct('outPath',outPath,'aviPath',aviPath,...
-    'graphicsPath',graphicsPath,'trackPath',trackPath,...
-    'timestamps_file_name',timestamps_file_name,...
-    'manualAnnotationsPath',manualAnnotationsPath,...
-    'FOV',FOV,'Npix',Npix,...%'spatRes',spatRes,...
-    'framespersec',framespersec,...
-    'ncl',ncl,'verbose',verbose);
+configStruct = struct('out_path',out_path,...
+    'track_path',track_path,...
+    'fov',fov,'n_pix',n_pix,...
+    'frames_per_sec',frames_per_sec);
 
 end
