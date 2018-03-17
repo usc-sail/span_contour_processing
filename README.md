@@ -12,14 +12,14 @@ to synthesize speech based on the real-time magnetic resonance imaging data.
 
 ## Authors
 
-Tanner Sorensen
-Signal Analysis and Interpretation Laboratory
-University of Southern California
+Tanner Sorensen  
+Signal Analysis and Interpretation Laboratory  
+University of Southern California  
 Los Angeles, CA
 
-Asterios Toutios
-Signal Analysis and Interpretation Laboratory
-University of Southern California
+Asterios Toutios  
+Signal Analysis and Interpretation Laboratory  
+University of Southern California  
 Los Angeles, CA
 
 
@@ -47,8 +47,8 @@ and the inferior margin of the hypopharynx.
 
 <img src="demo/images/gui_02.jpg" width="200">
 
-Enter y into Matlab command prompt to accept, 
-or enter n to click again.
+Enter `y` into Matlab command prompt to accept, 
+or enter `n` to click again.
 
 Guided factor analysis produces figures for each factor.
 
