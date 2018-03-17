@@ -23,9 +23,16 @@ University of Southern California
 Los Angeles, CA
 
 
+## Dependencies
+
+Dependencies:
++ MATLAB
++ Statistics and Machine Learning Toolbox
+
+
 ## Demo
 
-Execute the demo by executing 
+Execute the demo with the Bash commands
 
 ```bash
 cd demo
