@@ -25,7 +25,6 @@ Los Angeles, CA
 
 ## Dependencies
 
-Dependencies:
 + MATLAB
 + Statistics and Machine Learning Toolbox
 
