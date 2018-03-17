@@ -56,10 +56,10 @@ Guided factor analysis produces figures for each factor.
 <img src="demo/images/factor_2_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
 <img src="demo/images/factor_3_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
 <img src="demo/images/factor_4_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
-<img src="demo/images/factor_5_jaw1_tng4_lip2_vel1_lar2" width="200">
+<img src="demo/images/factor_5_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
 
-<img src="demo/images/factor_6_jaw1_tng4_lip2_vel1_lar2" width="200">
-<img src="demo/images/factor_7_jaw1_tng4_lip2_vel1_lar2" width="200">
-<img src="demo/images/factor_8_jaw1_tng4_lip2_vel1_lar2" width="200">
-<img src="demo/images/factor_9_jaw1_tng4_lip2_vel1_lar2" width="200">
-<img src="demo/images/factor_10_jaw1_tng4_lip2_vel1_lar2" width="200">
+<img src="demo/images/factor_6_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
+<img src="demo/images/factor_7_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
+<img src="demo/images/factor_8_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
+<img src="demo/images/factor_9_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
+<img src="demo/images/factor_10_jaw1_tng4_lip2_vel1_lar2.jpg" width="200">
