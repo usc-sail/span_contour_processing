@@ -1,17 +1,29 @@
-# README #
+# SPAN Contour Processing
 
-(Written by Asterios, Nov 15 2017)
+The span_contour_processing repository is part of the processing pipeline 
+for real-time magnetic resonance imaging of speech production.
+The span_contour_processing repository processes the outputs of the 
+[span_segmentation](https://github.com/usc-sail/span_segmentation) repository.
+The outputs of the span_contour_processing repository are used by the
+[span_articulatory_strategies](https://github.com/usc-sail/span_articulatory_strategies) repository
+to obtain biomarkers of articulator synergies and by the 
+[span_synthesis](https://github.com/usc-sail/span_synthesis) repository 
+to synthesize speech based on the real-time magnetic resonance imaging data.
 
-### Attention ###
+## Authors
 
-The code here will need some testing in an actual articulatory synthesis setup to make absolutely sure everything is correct.
+Tanner Sorensen
+Signal Analysis and Interpretation Laboratory
+University of Southern California
+Los Angeles, CA
 
-Some more cleaning can be done, but at this point I consider it optional (we can deal with it if we publish this code).
+Asterios Toutios
+Signal Analysis and Interpretation Laboratory
+University of Southern California
+Los Angeles, CA
 
-### Instructions ###
 
-* Take the tracking mat files of a speaker and put it in a directory (This will be your trackPath)
-* Create a directory to store results (outPath)
-* Edit accordingly lines 43-44 of config.m
+## Demo
 
-* Run wrap_build_model. The result will be a contourdata.mat file in outPath
+Execute the demo by executing `./demo/run.sh`.
+
