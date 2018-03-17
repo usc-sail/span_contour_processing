@@ -53,6 +53,7 @@ or enter n to click again.
 Guided factor analysis produces figures for each factor.
 
 | <img src="demo/images/factor_1_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_2_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_3_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_4_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_5_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> |
+| :--- | :--- | :--- | :--- | :--- | 
 | jaw | tongue 1 | tongue 2 | tongue 3 | tongue 4 |
 | <img src="demo/images/factor_6_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_7_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_8_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_9_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> | <img src="demo/images/factor_10_jaw1_tng4_lip2_vel1_lar2.jpg" width="200"> |
 | lips 1 | lips 2 | velum | pharynx 1 | pharynx 2 |
