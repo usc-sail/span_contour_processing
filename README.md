@@ -40,12 +40,12 @@ cd demo
 
 A Matlab figure window will appear.
 
-![](demo/images/gui_01.jpg?raw=true)
+<img src="demo/images/gui_01.jpg" width="200">
 
 Click on the superior margin of the nasopharynx 
 and the inferior margin of the hypopharynx. 
 
-![](demo/images/gui_02.jpg?raw=true)
+<img src="demo/images/gui_02.jpg" width="200">
 
 Enter y into Matlab command prompt to accept, 
 or enter n to click again.
