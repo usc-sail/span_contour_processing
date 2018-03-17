@@ -1,41 +1,81 @@
-% WRAP_MAKE_CONTOUR_DATA - makes a MAT file containing all segmentation 
-% results in configStruct.datPath and saving the MAT file at the location 
-% configStruct.outPath.
+% WRAP_BUILD_MODEL This script generates contour data, factors, and
+% constriction degrees for every non-hidden directory in the directory 
+% SUBJECT_DIR. 
 % 
-% Asterios Toutios (base on code by Tanner Sorensen)
+% Tanner Sorensen
+% Signal Analysis and Interpretation Laboratory
 % University of Southern California
-% Nov 15, 2017
+% 03/16/2018
 
+% add to path the functions called during the analysis
 addpath(genpath('functions'))
 
-% configure constant parameters of the analysis
+% set the constant parameters of the analysis
 config_struct = config;
 
-% verify that the directory containing segmentation results exists
-if ~exist(config_struct.track_path,'dir')
-    warning(['The directory containing segmentation results does not exist. ',...
-        'Create directory\n  %s\nor change the directory name in the file config.m'],...
-        config_struct.trackPath)
-end
+% obtain a cell array subject_list whose entries are the string subject
+% identifiers.
+subject_dir = 'C:\Users\tsorense\Documents\synergies\analysis\segmentation_results\';
+subject_list = dir(subject_dir);
+subject_list = {subject_list.name};
+subject_list = subject_list(cellfun(@(x) ~startsWith(x,'.'), subject_list)); % omit hidden directories
 
-% make directory for outputs, if the directory does not exist
-if ~exist(config_struct.out_path,'dir')
-    mkdir(config_struct.out_path)
-end
+% set regex expression into which the string subject identifiers will be
+% substituted in to obtain paths to segmentation results
+% (master_track_path), outputs of the analysis (master_out_path), and 
+% manual annotations for the analysis (master_manual_annotations_path)
+master_track_path = config_struct.track_path;
+master_out_path = config_struct.out_path;
+master_manual_annotations_path = config_struct.manual_annotations_path;
 
-% The call to make_contour_data below generates the file contourdata.mat in
-% the directory configuStruct.outpath
-make_contour_data(config_struct)
-
-% Perform factor analysis of the contours in the file ./mat/contourdata.mat
+% set the parameters of the factor analysis
+jaw_fac = [1 2 3];
+n_jaw_fac = length(jaw_fac);
 variant_switch = 'sorensen2018';
-get_Ugfa(config_struct,variant_switch)
 
-% measure task variables
-get_tv(config_struct,false)
+for i=1:length(subject_list)
+    disp(subject_list{i})
+    disp(['subject ' num2str(i) '/' num2str(length(subj_list))])
+    
+    % substitute the participant string identifier into the path. 
+    config_struct.track_path = strrep(master_track_path,'%s',subject_list{i});
+    config_struct.out_path = strrep(master_out_path,'%s',subject_list{i});
+    config_struct.manual_annotations_path = strrep(master_manual_annotations_path,'%s',subject_list{i});
+    
+    % verify that the directory containing segmentation results exists
+    if ~exist(config_struct.track_path,'dir')
+        warning(['The directory containing segmentation results does not exist. ',...
+            'Create directory\n  %s\nor change the directory name in the file config.m'],...
+            config_struct.track_path)
+    end
 
-% measure task variables after recon
-get_tv(config_struct,true)
+    % make directory for outputs, if the directory does not exist
+    if ~exist(config_struct.out_path,'dir')
+        mkdir(config_struct.out_path)
+    end
+    
+    % the call to make_contour_data below generates the file 
+    % 'contourdata.mat' in the directory configu_struct.out_path
+    q_init = struct('jaw',1,'tng',8,'lip',3,'vel',1,'lar',2);
+    init_contour_data_file_name = fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2.mat',q_init.jaw,q_init.tng,q_init.lip));
+    make_contour_data(config_struct,q_init)
 
-% get locally linear map
-get_map(config_struct)
+    % obtain manual annotations for pharynx location
+    if exist(fullfile(config_struct.manual_annotations_path,'phar_idx.mat'),'file') == 0
+        make_manual_annotations(config_struct,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2.mat',q_init.jaw,q_init.tng,q_init.lip));
+    end
+    load(fullfile(config_struct.manual_annotations_path,'phar_idx.mat'),'phar_idx')
+    
+    % measure task variables
+    get_tv(config_struct,false,q_init,phar_idx)
+    
+    % obtain models with different factor analysis parameterizations
+    for j=1:n_jaw_fac
+        q = struct('jaw',jaw_fac(j),'tng',8,'lip',3,'vel',1,'lar',2);
+        dest_contour_data_file_name = fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2.mat',q.jaw,q.tng,q.lip));
+        if ~strcmp(init_contour_data_file_name,dest_contour_data_file_name)
+            copyfile(init_contour_data_file_name,dest_contour_data_file_name);
+        end
+        get_Ugfa(config_struct,variant_switch,q)
+    end
+end

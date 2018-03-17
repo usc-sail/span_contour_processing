@@ -70,6 +70,7 @@ else
     % covariance matrix
     R = Dnorm_zero'*Dnorm_zero/(n-1);
     
-    U_lip = R*U_lipraw/chol(diag(latent));
+    q_max = 8;
+    U_lip = R*U_lipraw(:,1:q_max)/chol(diag(latent(1:q_max)));
     
 end

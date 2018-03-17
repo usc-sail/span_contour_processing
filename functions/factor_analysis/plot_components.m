@@ -1,4 +1,4 @@
-function plot_components(contourdata, variant_switch)
+function plot_components(config_struct, contourdata, variant_switch, q)
 
 sections_id=contourdata.sections_id;
 
@@ -17,32 +17,34 @@ else
     Dnorm=D-mean_data;
 end
 
-components=[1 2:5 6:8 9:10];
-names={'jaw','tongue 1' , 'tongue 2', 'tongue 3', 'tongue 4', 'lips 1','lips 2', 'velum',  'larynx 1', 'larynx 2'}; 
+components=[1:q.jaw ...
+    (q.jaw+1):(q.jaw+q.tng) ...
+    (q.jaw+q.tng+1):(q.jaw+q.tng+q.lip) ...
+    (q.jaw+q.tng+q.lip+1):(q.jaw+q.tng+q.lip+q.vel) ...
+    (q.jaw+q.tng+q.lip+q.vel+1):(q.jaw+q.tng+q.lip+q.vel+q.lar)];
 
 close all;
 
-for j=1:10;  % component under examination
+for j=1:(q.jaw+q.tng+q.lip+q.vel+q.lar);  % component under examination
     
-    parameters=zeros(1,10);
-    subplot(2,5,j);
+    parameters=zeros(1,q.jaw+q.tng+q.lip+q.vel+q.lar);
     
     i=components(j);
     
     %DD = Dnorm*U(:,i)*pinv(U(:,i));
     
     parameters(i)=-2*std_weights(i);
-    plot_from_xy(weights_to_vtshape(parameters, mean_vt_shape, U, variant_switch),sections_id(1,:),'b'); hold on;
+    plot_from_xy(weights_to_vtshape(parameters, mean_vt_shape, U, variant_switch),sections_id(1,:),'b'); hold on
     
     parameters(i)=2*std_weights(i);
-    plot_from_xy(weights_to_vtshape(parameters, mean_vt_shape, U, variant_switch),sections_id(1,:),'r'); hold on;
+    plot_from_xy(weights_to_vtshape(parameters, mean_vt_shape, U, variant_switch),sections_id(1,:),'r'); 
     
-    plot_from_xy(mean(D),sections_id(1,:),'k');
-    
-    text(-20, -20, names(j));
-    
+    plot_from_xy(mean(D),sections_id(1,:),'k'); hold off
+        
     axis([-40 20 -30 30]); axis off;
 
-    
+    print(fullfile(config_struct.out_path,sprintf('factor_%d_jaw%d_tng%d_lip%d_vel%d_lar%d.pdf',j,q.jaw,q.tng,q.lip,q.vel,q.lar)),'-dpdf')
 end
+
+
 

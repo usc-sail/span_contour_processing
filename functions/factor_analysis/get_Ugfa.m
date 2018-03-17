@@ -1,106 +1,131 @@
-function get_Ugfa(configStruct,varargin)
+function get_Ugfa(config_struct,varargin)
 % GET_UGFA - extract factors of vocal tract shape the contours in the file
 % contour_data.mat
 % 
 % INPUT:
-%  Variable name: configStruct
+%  Variable name: config_struct
 %  Size: 1x1
 %  Class: struct
 %  Description: Fields correspond to constants and hyperparameters. 
 %  Fields: 
-%  - outPath: (string) path for saving MATLAB output
-%  - aviPath: (string) path to the AVI files
-%  - graphicsPath: (string) path to MATALB graphical output
-%  - trackPath: (string) path to segmentation results
-%  - manualAnnotationsPath: (string) path to manual annotations
-%  - timestamps_file_name_<dataset>: (string) file name with path of 
-%      timestamps file name for each data-set <dataset> of the analysis
-%  - folders_<dataset>: (cell array) string folder names which belong to 
-%      each data-set <dataset> of the analysis
-%  - tasks: (cell array) string identifiers for different tasks
-%  - FOV: (double) size of field of view in mm^2
-%  - Npix: (double) number of pixels per row/column in the imaging plane
-%  - framespersec_<dataset>: (double) frame rate of reconstructed real-time
-%      magnetic resonance imaging videos in frames per second for each 
-%      data-set <dataset> of the analysis
-%  - ncl: (double array) entries are (i) the number of constriction 
-%      locations at the hard and soft palate and (ii) the number of 
-%      constriction locations at the hypopharynx (not including the 
-%      nasopharynx).
-%  - f: (double) hyperparameter which determines the percent of data used 
-%      in locally weighted linear regression estimator of the jacobian; 
-%      multiply f by 100 to obtain the percentage
-%  - verbose: controls non-essential graphical and text output
-%  
-%  Variable name: dataset
-%  Size: arbitrary
+%  - out_path: (string) path for saving MATLAB output
+%  - track_path: (string) path to segmentation results
+%  - manual_annotations_path: (string) path to manual annotations
+%  - fov: (double) size of field of view in mm^2
+%  - n_pix: (double) number of pixels per row/column in the imaging plane
+%  - frames_per_sec: (double) frame rate of reconstructed real-time
+%      magnetic resonance imaging videos in frames per second
+%
+% OPTIONAL INPUTS:
+%  Variable name: variant_switch
+%  Size: 1xN, N undetermined
 %  Class: char
-%  Description: determines which data-set to analyze; picks out the
-%  appropriate constants from configStruct.
+%  Default value: 'toutios2015factor'
+%  Description: either 'toutios2015factor' or 'sorensen2018', which
+%    indicates which variant of the factor analysis to use.
+% 
+%  Variable name: q
+%  Size: 1x1
+%  Class: struct
+%  Default value: struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2)
+%  Description: struct array that indicates the number of factors for the
+%    jaw, tongue, lips, velum, and larynx.
+% 
+%  Variable name: sim_switch
+%  Size: 1x1
+%  Class: logical
+%  Default value: false
+%  Description: logical flag that indicates whether to compute constriction
+%    degrees using original (x,y)-coordinates of articulator contours
+%    (false) or using the (x,y)-coordinates of articulator contours that
+%    have been projected onto the column space of the factors (true).
 % 
 % FUNCTION OUTPUT:
 %  none
 % 
 % SAVED OUTPUT: 
-%  Path: configStruct.pathOut
-%  File name: U_gfa_<dataset>.mat
-%  Variable name: U_gfa 
+%  Path: config_struct.out_path
+%  File name: given by the string value of 
+%    sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)
+%  Variable name: contour_data
 %  Size: 1x1
 %  Class: struct
-%  Description: Struct with fields for each subject (field name is subject 
-%    ID, e.g., 'at1_rep'). The fields are 400x8 matrices of type double.
-%    The columns correspond to factors and the rows correspond to 
-%    coordinates of the factors on the (X,Y)-plane. 
-%    - Column 1 - jaw factor
-%    - Columns 2-5 - tongue factors
-%    - Column 6-7 - lip factors
-%    - Column 8 - velum factor
+%  Description: Contains the contour data, along with the constriction
+%    degrees computed by this function. Other fields are possible, but the
+%    fields added are listed below. 
+%    - U_gfa: double array of size 400xQ, where Q is the number of factors,
+%      as determined by optional input q, which has the factors in the
+%      columns.
+%    - var_expl: double with percent variance explained (0-1). 
+%    - weights: double array of size NxQ, where N is the number of
+%      real-time magnetic resonance images and Q is the number of factors,
+%      as determined by the optional input q. The entries are the factor
+%      scores for each factor in each image. 
+%    - mean_vt_shape: double array with the mean value of each contour
+%      vertex
+%    - Xsim: double array of size NxP, where N is the number of images and 
+%      P is the number of contour vertices, with the x-coordinates of the 
+%      contour vertices projected onto the column space of the factors. 
+%    - Ysim: double array of size NxP, where N is the number of images and 
+%      P is the number of contour vertices, with the y-coordinates of the 
+%      contour vertices projected onto the column space of the factors. 
 % 
-% Asterios Toutios (based on code by Tanner Sorensen)
+% Tanner Sorensen
+% Signal Analysis and Interpretation Laboratory
 % University of Southern California
-% Nov 15, 2017
+% 03/16/2018
 
 if nargin<2
     variant_switch = 'toutios2015factor';
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    sim_switch = false;
 elseif nargin==2
     variant_switch = varargin{1};
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    sim_switch = false;
+elseif nargin==3
+    variant_switch = varargin{1};
+    q = varargin{2};
+    sim_switch = false;
+elseif nargin==4
+    variant_switch = varargin{1};
+    q = varargin{2};
+    sim_switch = varargin{3};
 else
+    variant_switch = 'toutios2015factor';
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    sim_switch = false;
     warning(['Function get_Ugfa.m was called with %d input arguments,' ...
-        ' but requires 1 (optionally 2)'],nargin)
+        ' but requires 1 (optionally 2, 3, or 4)'],nargin)
 end
 
-load(fullfile(configStruct.out_path,'contour_data.mat'))
+disp('Performing guided factor analysis')
 
-% warning('off','stats:pca:ColRankDefX')
-% warning('off','MATLAB:hg:AutoSoftwareOpenGL')
-
-disp('Performing factor analysis.')
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)))
 
 d = size(contour_data.X,2);
     
 U_gfa=zeros(2*d,10);
 
 U_jaw = get_Ujaw(contour_data,variant_switch);
-U_gfa(:,1)=U_jaw(:,1);
+idx = 1:q.jaw;
+U_gfa(:,idx)=U_jaw(:,1:q.jaw);
 
-U_tng = get_Utng(contour_data,U_jaw(:,1),variant_switch);
-U_gfa(:,2:5)=U_tng(:,1:4);
+U_tng = get_Utng(contour_data,U_jaw(:,1:q.jaw),variant_switch);
+idx = (q.jaw+1):(q.jaw+q.tng);
+U_gfa(:,idx)=U_tng(:,1:q.tng);
 
-U_lip = get_Ulip(contour_data,U_jaw(:,1),variant_switch);
-U_gfa(:,6:7)=U_lip(:,1:2);
+U_lip = get_Ulip(contour_data,U_jaw(:,1:q.jaw),variant_switch);
+idx = (q.jaw+q.tng+1):(q.jaw+q.tng+q.lip);
+U_gfa(:,idx)=U_lip(:,1:q.lip);
 
-U_vel = get_Uvel(contour_data,U_jaw(:,1),variant_switch);
-U_gfa(:,8)=U_vel(:,1);
+U_vel = get_Uvel(contour_data,U_jaw(:,1:q.jaw),variant_switch);
+idx = (q.jaw+q.tng+q.lip+1):(q.jaw+q.tng+q.lip+q.vel);
+U_gfa(:,idx)=U_vel(:,1:q.vel);
 
-U_lar = get_Ular(contour_data,U_jaw(:,1),variant_switch);
-U_gfa(:,9:10)=U_lar(:,1:2);
-
-%U_head = get_Uhead(contour_data);
-%U_gfa(:,11:12)=U_head(:,1:2);
-
-
-% warning('on','stats:pca:ColRankDefX')
-% warning('on','MATLAB:hg:AutoSoftwareOpenGL')
+U_lar = get_Ular(contour_data,U_jaw(:,1:q.jaw),variant_switch);
+idx = (q.jaw+q.tng+q.lip+q.vel+1):(q.jaw+q.tng+q.lip+q.vel+q.lar);
+U_gfa(:,idx)=U_lar(:,1:q.lar);
 
 D = [contour_data.X,contour_data.Y];
 mean_data=ones(size(D,1),1)*mean(D);
@@ -115,22 +140,24 @@ contour_data.mean_vt_shape = mean_vt_shape;
 contour_data.U_gfa = U_gfa;
 contour_data.weights = weights;
 
-figure; plot_components(contour_data, variant_switch);
+figure; plot_components(config_struct, contour_data, variant_switch, q);
 
-n = size(weights,1);
+if sim_switch == true
+    n = size(weights,1);
+    xy_data = D;
+    for i=1:n
+        xy_data(i,:) = weights_to_vtshape(weights(i,:), mean_vt_shape,  U_gfa, variant_switch);
+    end
+    Xsim = xy_data(:,1:d);
+    Ysim = xy_data(:,(d+1):end);
+    
+    contour_data.Xsim = Xsim;
+    contour_data.Ysim = Ysim;
+    
+    contour_data.var_expl = sum(var([contour_data.Xsim(:,idx),contour_data.Ysim(:,idx)])) ...
+        / sum(var([contour_data.X(:,idx),contour_data.Y(:,idx)]));
+end
 
-xy_data = D;
-
-for i=1:n
-    xy_data(i,:) = weights_to_vtshape(weights(i,:), mean_vt_shape,  U_gfa, variant_switch);
-end;
-
-Xsim = xy_data(:,1:d);
-Ysim = xy_data(:,(d+1):end);
-
-contour_data.Xsim = Xsim;
-contour_data.Ysim = Ysim;
-
-save(fullfile(configStruct.out_path,'contour_data.mat'),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
 
 end

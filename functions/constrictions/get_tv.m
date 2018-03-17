@@ -1,27 +1,137 @@
-function get_tv(configStruct,varargin)
-% MAIN - compute task variables from articulator weights.
+function get_tv(config_struct,varargin)
+% GET_TV - compute constriction degrees at the phonetic places of articulation
 % 
-% Based heavily on the script of Vikram Ramanarayanan (SPAN-USC, 2009).
-%
+% INPUT:
+%  Variable name: config_struct
+%  Size: 1x1
+%  Class: struct
+%  Description: Fields correspond to constants and hyperparameters. 
+%  Fields: 
+%  - out_path: (string) path for saving MATLAB output
+%  - track_path: (string) path to segmentation results
+%  - manual_annotations_path: (string) path to manual annotations
+%  - fov: (double) size of field of view in mm^2
+%  - n_pix: (double) number of pixels per row/column in the imaging plane
+%  - frames_per_sec: (double) frame rate of reconstructed real-time
+%      magnetic resonance imaging videos in frames per second
+% 
+% OPTIONAL INPUT:
+%  Variable name: sim_switch
+%  Size: 1x1
+%  Class: logical
+%  Default value: false
+%  Description: logical flag that indicates whether to compute constriction
+%    degrees using original (x,y)-coordinates of articulator contours
+%    (false) or using the (x,y)-coordinates of articulator contours that
+%    have been projected onto the column space of the factors (true).
+% 
+%  Variable name: q
+%  Size: 1x1
+%  Class: struct
+%  Default value: struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2)
+%  Description: struct array that indicates the number of factors for the
+%    jaw, tongue, lips, velum, and larynx.
+% 
+%  Variable name: phar_idx
+%  Size: 0x0 or 1x2
+%  Class: double
+%  Defailt value: []
+%  Description: either empty array or array of two pharynx contour indices,
+%    one specifying the first and the other specifying the last index of
+%    the contour vertices of the nasopharynx and hypopharynx. If empty, all
+%    contour vertices after 15 are used, a trick which removes most of the
+%    trachea and larynx contour vertices. See 'make_manual_annotations.m'
+%    for details of how to obtain phar_idx by manual annotation.
+% 
+% FUNCTION OUTPUT:
+%  none
+% 
+% SAVED OUTPUT: 
+%  File name: given by the string value of 
+%    sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)
+%  Variable name: contour_data
+%  Size: 1x1
+%  Class: struct
+%  Description: Contains the contour data, along with the constriction
+%    degrees computed by this function. Other fields are possible, but the
+%    fields added are listed below. 
+%  Fields: 
+%  - tv: (cell array) cell array of length 6 with the fields corresponding
+%     to the phonetic places of articulation: 
+%       (1) LA - lip aperture; 
+%       (2) ALV - alveolar constriction degree; 
+%       (3) PAL - palatal constriction degree; 
+%       (4) VEL - velar constriction degree;
+%       (5) PHAR - pharyngeal constriction degree; 
+%       (6) VP - velopharyngeal port. 
+%      Each field is a structured array with fields corresponding to
+%      consriction degree, index of inner structure used to compute the
+%      constriction degree, and index of the outer structure used to
+%      compute the constriction degree.
+%       cd - (Nx1) double array containing constriction degrees
+%       in - (Nx2) double array containing x (1st column) and y (2nd
+%       column) of index of inner structure used to compute the
+%       constriction degree.
+%       out - (Nx2) double array containing x (1st column) and y (2nd
+%       column) of index of outer structure used to compute the
+%       constriction degree.
+%     This field is added if sim_switch is false. 
+% 
+%  - tvsim: (cell array) cell array of length 6 with the fields 
+%     corresponding to the phonetic places of articulation: 
+%       (1) LA - lip aperture; 
+%       (2) ALV - alveolar constriction degree; 
+%       (3) PAL - palatal constriction degree; 
+%       (4) VEL - velar constriction degree;
+%       (5) PHAR - pharyngeal constriction degree; 
+%       (6) VP - velopharyngeal port. 
+%      Each field is a structured array with fields corresponding to
+%      consriction degree, index of inner structure used to compute the
+%      constriction degree, and index of the outer structure used to
+%      compute the constriction degree.
+%       cd - (Nx1) double array containing constriction degrees
+%       in - (Nx2) double array containing x (1st column) and y (2nd
+%       column) of index of inner structure used to compute the
+%       constriction degree.
+%       out - (Nx2) double array containing x (1st column) and y (2nd
+%       column) of index of outer structure used to compute the
+%       constriction degree.
+%     This field is added if sim_switch is true.
+% 
+% EXAMPLE USAGE: 
+%  >> get_tv(config_struct,false,q,phar_idx)
+% 
 % Tanner Sorensen
-
-% Load data of contours, weights, and model.
-%load ../contour_data_gfa.mat
-%addpath ./util
-%contour_data = contour_data_gfa;
+% Signal Analysis and Interpretation Laboratory
+% University of Southern California
+% 03/16/2018
 
 if nargin < 2
     sim_switch = false;
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    phar_idx = [];
 elseif nargin == 2
     sim_switch = varargin{1};
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    phar_idx = [];
+elseif nargin == 3
+    sim_switch = varargin{1};
+    q = varargin{2};
+    phar_idx = [];
+elseif nargin == 4
+    sim_switch = varargin{1};
+    q = varargin{2};
+    phar_idx = varargin{3};
 else
     sim_switch = false;
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    phar_idx = [];
     warning(['Function get_tv.m was called with %d input arguments,' ...
-        ' but requires 1 (optionally 2)'],nargin)
+        ' but requires 1 (optionally 2, 3, or 4)'],nargin)
 end
 
 % load articulator contours in the structured array contour_data
-load(fullfile(configStruct.out_path,'contour_data.mat'))
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)))
 
 % make articulator contours denser by a factor of six
 ds = 1/6;
@@ -58,22 +168,22 @@ for i=1:nFiles
         % segment the vocal tract into pieces
         [Xul,Yul,Xll,Yll,Xtongue,Ytongue,Xalveolar,...
             Yalveolar,Xpalatal,Ypalatal,Xvelum,Yvelum,...
-            Xvelar,Yvelar,Xphar,Yphar] = vtSeg(contour_data,...
-            i,frames(j),ds,sim_switch);
+            Xvelar,Yvelar,Xphar,Yphar,Xepig,Yepig] = vt_seg(contour_data,...
+            i,frames(j),ds,sim_switch,phar_idx);
         
         % obtain task variables
-        %   LA - lip aperture
-        %   ALV - alveolar constriction degree
-        %   PAL - palatal constriction degree
-        %   VEL - velar constriction degree
-        %   PHAR - pharyngeal constriction degree
-        %   VP - velopharyngeal port
-        [la(k),ul_x(k),ul_y(k),ll_x(k),ll_y(k)] = get_la(Xul,Yul,Xll,Yll);
-        [alv(k),alv_x(k),alv_y(k),tng1_x(k),tng1_y(k)] = get_alv(Xalveolar,Yalveolar,Xtongue,Ytongue);
-        [pal(k),pal_x(k),pal_y(k),tng2_x(k),tng2_y(k)] = get_pal(Xpalatal,Ypalatal,Xtongue,Ytongue);
-        [vel(k),vel1_x(k),vel1_y(k),tng3_x(k),tng3_y(k)] = get_vel(Xvelar,Yvelar,Xtongue,Ytongue);
-        [phar(k),phar1_x(k),phar1_y(k),tng4_x(k),tng4_y(k)] = get_phar(Xphar,Yphar,Xtongue,Ytongue);
-        [vp(k),vel2_x(k),vel2_y(k),phar2_x(k),phar2_y(k)] = get_vp(Xvelum,Yvelum,Xphar,Yphar);
+        %   (1) LA - lip aperture
+        %   (2) ALV - alveolar constriction degree
+        %   (3) PAL - palatal constriction degree
+        %   (4) VEL - velar constriction degree
+        %   (5) PHAR - pharyngeal constriction degree
+        %   (6) VP - velopharyngeal port
+        [la(k),ul_x(k),ul_y(k),ll_x(k),ll_y(k)] = compute_constriction_degree(Xul,Yul,Xll,Yll);
+        [alv(k),alv_x(k),alv_y(k),tng1_x(k),tng1_y(k)] = compute_constriction_degree(Xalveolar,Yalveolar,Xtongue,Ytongue);
+        [pal(k),pal_x(k),pal_y(k),tng2_x(k),tng2_y(k)] = compute_constriction_degree(Xpalatal,Ypalatal,Xtongue,Ytongue);
+        [vel(k),vel1_x(k),vel1_y(k),tng3_x(k),tng3_y(k)] = compute_constriction_degree(Xvelar,Yvelar,Xtongue,Ytongue);
+        [phar(k),phar1_x(k),phar1_y(k),tng4_x(k),tng4_y(k)] = compute_constriction_degree(Xphar,Yphar,[Xtongue Xepig],[Ytongue Yepig]);
+        [vp(k),vel2_x(k),vel2_y(k),phar2_x(k),phar2_y(k)] = compute_constriction_degree(Xvelum,Yvelum,Xphar,Yphar);
         
         % incrememnt index for tv containers
         k=k+1;
@@ -86,12 +196,12 @@ if ~sim_switch
 else
     tv_label = 'tvsim';
 end
-contour_data.(tv_label){1}.cd=la; contour_data.tv{1}.in=[llx lly]; contour_data.tv{1}.out=[ulx uly];
-contour_data.(tv_label){2}.cd=vp; contour_data.tv{2}.in=[velumx1 velumy1]; contour_data.tv{2}.out=[pharynxx1 pharynxy1];
-contour_data.(tv_label){3}.cd=alv; contour_data.tv{3}.in=[tonguex2 tonguey2]; contour_data.tv{3}.out=[alveolarx alveolary];
-contour_data.(tv_label){4}.cd=pal; contour_data.tv{4}.in=[tonguex3 tonguey3]; contour_data.tv{4}.out=[palatalx palataly];
-contour_data.(tv_label){5}.cd=vel; contour_data.tv{5}.in=[tonguex1 tonguey1]; contour_data.tv{5}.out=[velumx2 velumy2];
-contour_data.(tv_label){6}.cd=phar; contour_data.tv{6}.in=[tonguex4 tonguey4]; contour_data.tv{6}.out=[pharynxx2 pharynxy2];
+contour_data.(tv_label){1}.cd=la;   contour_data.(tv_label){1}.in=[ll_x; ll_y]';     contour_data.(tv_label){1}.out=[ul_x; ul_y]';
+contour_data.(tv_label){2}.cd=alv;  contour_data.(tv_label){2}.in=[tng1_x; tng1_y]'; contour_data.(tv_label){2}.out=[alv_x; alv_y]';
+contour_data.(tv_label){3}.cd=pal;  contour_data.(tv_label){3}.in=[tng2_x; tng2_y]'; contour_data.(tv_label){3}.out=[pal_x; pal_y]';
+contour_data.(tv_label){4}.cd=vel;  contour_data.(tv_label){4}.in=[tng3_x; tng3_y]'; contour_data.(tv_label){4}.out=[vel1_x; vel1_y]';
+contour_data.(tv_label){5}.cd=phar; contour_data.(tv_label){5}.in=[tng4_x; tng4_y]'; contour_data.(tv_label){5}.out=[phar1_x; phar1_y]';
+contour_data.(tv_label){6}.cd=vp;   contour_data.(tv_label){6}.in=[vel2_x; vel2_y]'; contour_data.(tv_label){6}.out=[phar2_x; phar2_y]';
 
 % update contour_data to contain TV
-save(fullfile(configStruct.out_path,'contour_data.mat'),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')

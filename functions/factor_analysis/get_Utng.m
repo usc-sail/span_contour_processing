@@ -109,7 +109,7 @@ else
     % subset data to tongue
     sections_id = contour_data.sections_id;
     sec_id_2 = [sections_id,sections_id];
-    vt_section = [1 2]; % upper and lower lip labels
+    vt_section = [1 2]; % tongue and epiglottis labels
     Dnorm_zero = Dnorm;
     Dnorm_zero(:,~ismember(sec_id_2,vt_section))=0;
     
@@ -121,5 +121,6 @@ else
     % covariance matrix
     R = Dnorm_zero'*Dnorm_zero/(n-1);
     
-    U_tng = R*U_tngraw/chol(diag(latent));
+    q_max = 8;
+    U_tng = R*U_tngraw(:,1:q_max)/chol(diag(latent(1:q_max)));
 end

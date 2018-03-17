@@ -1,43 +1,32 @@
-function make_contour_data(config_struct)
-% MAKE_CONTOUR_DATA - make all the track files in configStruct.pathIn into
-% a structured array CONTOURDATA saved to file CONTOURDATA_ORIGINAL.mat in
-% configStruct.pathOut. configStruct.pathIn is the parent of the
-% directories whose names are in the configStruct.folders cell array.
+function make_contour_data(config_struct,varargin)
+% MAKE_CONTOUR_DATA - intitialize the struct contour_data containing the 
+% contour vertices contained in all the track files in the directory 
+% config_struct.track_path. The struct contour_data is saved to file 
+% contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat in configStruct.out_path.
+% This function must be called to initialize contour_data before taking 
+% further steps, such as the guided factor analysis or constriction degree 
+% estimation. 
 %
 % INPUT:
 %  Variable name: config_struct
 %  Size: 1x1
 %  Class: struct
-%  Description: Fields correspond to constants and hyperparameters.
-%  Fields:
-%  - outPath: (string) path for saving MATLAB output
-%  - aviPath: (string) path to the AVI files
-%  - graphicsPath: (string) path to MATALB graphical output
-%  - trackPath: (string) path to segmentation results
-%  - manualAnnotationsPath: (string) path to manual annotations
-%  - timestamps_file_name: (string) file name with path of
-%      timestamps file name
-%  - folders: (cell array) string folder names
-%  - tasks: (cell array) string identifiers for different tasks
-%  - FOV: (double) size of field of view in mm^2
-%  - Npix: (double) number of pixels per row/column in the imaging plane
-%  - framespersec: (double) frame rate of reconstructed real-time magnetic
-%      resonance imaging videos in frames per second
-%  - ncl: (double array) entries are (i) the number of constriction
-%      locations at the hard and soft palate and (ii) the number of
-%      constriction locations at the hypopharynx (not including the
-%      nasopharynx).
-%  - f: (double) hyperparameter which determines the percent of data used
-%      in locally weighted linear regression estimator of the jacobian;
-%      multiply f by 100 to obtain the percentage
-%  - verbose: controls non-essential graphical and text output
+%  Description: Fields correspond to constants and hyperparameters. 
+%  Fields: 
+%  - out_path: (string) path for saving MATLAB output
+%  - track_path: (string) path to segmentation results
+%  - manual_annotations_path: (string) path to manual annotations
+%  - fov: (double) size of field of view in mm^2
+%  - n_pix: (double) number of pixels per row/column in the imaging plane
+%  - frames_per_sec: (double) frame rate of reconstructed real-time
+%      magnetic resonance imaging videos in frames per second
 %
 % FUNCTION OUTPUT:
 %  none
 %
 % SAVED OUTPUT:
-%  Path: config_struct.pathOut
-%  File name: contourdata.mat
+%  Path: config_struct.path_out
+%  File name: value of sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)
 %  Variable name: contour_data
 %  Size: 1x1
 %  Class: struct
@@ -49,20 +38,31 @@ function make_contour_data(config_struct)
 %      in rows
 %  - Y: Y-coordinates of tissue-air boundaries in columns and time-samples
 %      in rows
-%  - File: file ID for each time-sample, note that this indexes the cell
+%  - files: file ID for each time-sample, note that this indexes the cell
 %      array of string file names in fl
-%  - fl: cell array of string file names indexed by the entries of File
-%  - SectionsID: array of numeric IDs for X- and Y-coordinates in the
+%  - file_list: cell array of string file names indexed by the entries of File
+%  - sections_id: array of numeric IDs for X- and Y-coordinates in the
 %      columns of the variables in fields X, Y; the correspondences are as
 %      follows: 01 Epiglottis; 02 Tongue; 03 Incisor; 04 Lower Lip; 05 Jaw;
 %      06 Trachea; 07 Pharynx; 08 Upper Bound; 09 Left Bound; 10 Low Bound;
 %      11 Palate; 12 Velum; 13 Nasal Cavity; 14 Nose; 15 Upper Lip
-%  - Frames: frame number; 1 is first segmented video frame
-%  - VideoFrames: frame number; 1 is first frame of avi video file
-%
+%  - frames: frame number; 1 is first segmented video frame
+%  - video_frames: frame number; 1 is first frame of avi video file
+% 
 % Tanner Sorensen
 % Signal Analysis and Interpretation Laboratory
-% Feb. 14, 2017
+% University of Southern California
+% 03/16/2018
+
+if nargin < 2
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+elseif nargin == 2
+    q = varargin{1};
+else
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    warning(['Function get_map.m was called with %d input arguments,' ...
+        ' but requires 1 (optionally 2)'],nargin)
+end
 
 path_in = config_struct.track_path;
 path_out = config_struct.out_path;
@@ -137,6 +137,6 @@ Y(:,sections_id==11) = repmat(mean(Y(:,sections_id==11),1),length(files),1);
 contour_data = struct('X',X,'Y',Y,...
     'files',files,'file_list',{file_list},'sections_id',sections_id','frames',frames,'video_frames',video_frames);
 
-save(fullfile(path_out,'contour_data.mat'),'contour_data')
+save(fullfile(path_out,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
 
 end

@@ -1,4 +1,4 @@
-function get_map(configStruct)
+function get_map(configStruct,varargin)
 % WRAPFWDMAP - estimate the forward kinematic map
 %
 % input
@@ -13,12 +13,22 @@ function get_map(configStruct)
 % Signal Analysis and Interpretation Laboratory
 % University of Southern California
 
+if nargin < 2
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+elseif nargin == 2
+    q = varargin{1};
+else
+    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
+    warning(['Function get_map.m was called with %d input arguments,' ...
+        ' but requires 1 (optionally 2)'],nargin)
+end
+
 % load task variables and weights for subjects SUBJ
 out_path = configStruct.out_path;
 frames_per_sec = configStruct.frames_per_sec;
 crit = 0.5;
 
-load(fullfile(out_path,'contour_data.mat'))
+load(fullfile(out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)))
 
 nf = 8;
 nz = 6;
@@ -99,6 +109,6 @@ contour_data.nClusters = size(centers,1);
 contour_data.linear = linInd;
 contour_data.nLinClusters = sum(linInd);
 
-save(fullfile(configStruct.out_path,'contour_data.mat'),'contour_data')
+save(fullfile(configStruct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
 
 end

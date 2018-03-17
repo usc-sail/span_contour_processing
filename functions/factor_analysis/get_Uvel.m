@@ -68,7 +68,8 @@ else
     %% Guided factor analysis
     % obtain data covariance matrix
     R = Dnorm_zero'*Dnorm_zero/n; % covariance matrix
-
-    U_vel = R*U_velraw/chol(diag(latent));
+    
+    q_max = 3;
+    U_vel = R*U_velraw(:,1:q_max)/chol(diag(latent(1:q_max)));
     
 end

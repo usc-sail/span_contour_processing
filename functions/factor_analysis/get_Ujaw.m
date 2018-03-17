@@ -111,6 +111,7 @@ else
     R = Dnorm_zero'*Dnorm_zero/(n-1);
 
     % obtain jaw factor
-    U_jaw = R*U_jawraw/(chol(diag(latent)));
+    q_max = 3;
+    U_jaw = R*U_jawraw(:,1:q_max)/(chol(diag(latent(1:q_max))));
     
 end
