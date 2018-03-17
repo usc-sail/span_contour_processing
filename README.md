@@ -38,3 +38,27 @@ cd demo
 ./demo/run.sh
 ```
 
+A Matlab figure window will appear.
+
+![](demo/images/gui_01.jpg?raw=true)
+
+Click on the superior margin of the nasopharynx 
+and the inferior margin of the hypopharynx. 
+
+![](images/gui_02.jpg?raw=true)
+
+Enter y into Matlab command prompt to accept, 
+or enter n to click again.
+
+Guided factor analysis produces figures for each factor.
+
+![](images/factor_1_jaw1_tng4_lip2_vel1_lar2.jpg?raw=true)
+![](images/factor_2_jaw1_tng4_lip2_vel1_lar2.jpg?raw=true)
+![](images/factor_3_jaw1_tng4_lip2_vel1_lar2.jpg?raw=true)
+![](images/factor_4_jaw1_tng4_lip2_vel1_lar2.jpg?raw=true)
+![](images/factor_5_jaw1_tng4_lip2_vel1_lar2?raw=true)
+![](images/factor_6_jaw1_tng4_lip2_vel1_lar2?raw=true)
+![](images/factor_7_jaw1_tng4_lip2_vel1_lar2?raw=true)
+![](images/factor_8_jaw1_tng4_lip2_vel1_lar2?raw=true)
+![](images/factor_9_jaw1_tng4_lip2_vel1_lar2?raw=true)
+![](images/factor_10_jaw1_tng4_lip2_vel1_lar2?raw=true)
