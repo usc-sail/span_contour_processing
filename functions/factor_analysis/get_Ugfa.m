@@ -15,6 +15,7 @@ function get_Ugfa(config_struct,varargin)
 %  - n_pix: (double) number of pixels per row/column in the imaging plane
 %  - frames_per_sec: (double) frame rate of reconstructed real-time
 %      magnetic resonance imaging videos in frames per second
+%  - verbose: (logical) if true, plot graphics; otherwise, do not plot.
 %
 % OPTIONAL INPUTS:
 %  Variable name: variant_switch
@@ -101,7 +102,7 @@ end
 
 disp('Performing guided factor analysis')
 
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)))
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
 
 d = size(contour_data.X,2);
     
@@ -140,7 +141,9 @@ contour_data.mean_vt_shape = mean_vt_shape;
 contour_data.U_gfa = U_gfa;
 contour_data.weights = weights;
 
-figure; plot_components(config_struct, contour_data, variant_switch, q);
+if config_struct.verbose
+    figure; plot_components(config_struct, contour_data, variant_switch, q);
+end
 
 if sim_switch == true
     n = size(weights,1);

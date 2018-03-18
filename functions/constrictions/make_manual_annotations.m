@@ -47,7 +47,7 @@ function make_manual_annotations(config_struct,file_name)
     load(fullfile(config_struct.out_path,file_name),'contour_data');
     
     % break contours down into parts
-    [~,~,~,~,Xtongue,Ytongue,~,~,~,~,~,~,~,~,Xphar,Yphar,Xepig,Yepig] = vt_seg(contour_data,contour_data.files(1),contour_data.frames(1),1,false,[1 50]);
+    [~,~,~,~,Xtongue,Ytongue,~,~,~,~,Xvelum,Yvelum,~,~,Xphar,Yphar,Xepig,Yepig] = vt_seg(contour_data,contour_data.files(1),contour_data.frames(1),1,false,[1 50]);
     
     accept_state = false;
     while accept_state==false
@@ -56,6 +56,7 @@ function make_manual_annotations(config_struct,file_name)
         plot(Xtongue,Ytongue), hold on
         plot(Xepig,Yepig)
         plot(Xphar,Yphar)
+        plot(Xvelum,Yvelum)
         axis equal
         
         % obtain manual annotations
