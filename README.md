@@ -26,8 +26,8 @@ Los Angeles, CA
 ## Dependencies
 
 + MATLAB
-+ Statistics and Machine Learning Toolbox
-
++ MATLAB Statistics and Machine Learning Toolbox
++ `wget` (on Mac OSX, install using homebrew with `brew install wget`)
 
 ## Demo
 
