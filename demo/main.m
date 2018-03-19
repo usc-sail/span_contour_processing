@@ -1,8 +1,6 @@
 % DEMO This script generates contour data, factors, and
 % constriction degrees for the demo subject in 'demo_dir'
 % 
-% Set up demo_dir by 
-% 
 % Tanner Sorensen
 % Signal Analysis and Interpretation Laboratory
 % University of Southern California
@@ -19,7 +17,7 @@ config_struct = config;
 subject_dir = fullfile('.','span_contour_processing_demo');
 subject_list = dir(subject_dir);
 subject_list = {subject_list.name};
-subject_list = subject_list(cellfun(@(x) isdir(fullfile('.','span_contour_processing_demo',x)), subject_list)); % omit regular files
+subject_list = subject_list(cellfun(@(x) isfolder(fullfile('.','span_contour_processing_demo',x)), subject_list)); % omit regular files
 subject_list = subject_list(cellfun(@(x) ~startsWith(x,'.'), subject_list)); % omit hidden directories
 
 % set regex expression into which the string subject identifiers will be
@@ -70,4 +68,7 @@ for i=1:length(subject_list)
     
     % guided factor analysis
     get_Ugfa(config_struct,variant_switch,q)
+    
+    % articulatory strategies
+    get_strategies(config_struct,q)
 end

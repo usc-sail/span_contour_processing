@@ -44,11 +44,16 @@ tr_per_image = 2;
 tr = 0.006004;
 frames_per_sec = 1/(tr_per_image*tr);
 
+f = 0.75;
+
+verbose = true;
+
 % make the struct object
 configStruct = struct('out_path',out_path,...
     'track_path',track_path,...
     'manual_annotations_path',manual_annotations_path,...
     'fov',fov,'n_pix',n_pix,...
-    'frames_per_sec',frames_per_sec);
+    'frames_per_sec',frames_per_sec,...
+    'f',f,'verbose',verbose);
 
 end
