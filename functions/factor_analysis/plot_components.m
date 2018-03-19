@@ -1,15 +1,15 @@
-function plot_components(config_struct, contourdata, variant_switch, q)
+function plot_components(config_struct, contour_data, variant_switch, q)
 
-sections_id=contourdata.sections_id;
+sections_id=contour_data.sections_id;
 
-D=[contourdata.X,contourdata.Y];
-U=contourdata.U_gfa;
-mean_vt_shape=contourdata.mean_vt_shape;
+D=[contour_data.X,contour_data.Y];
+U=contour_data.U_gfa;
+mean_vt_shape=contour_data.mean_vt_shape;
 
 mean_data=ones(size(D,1),1)*mean(D);
 std_data=ones(size(D,1),1)*std(D);
 
-std_weights = std(contourdata.weights);
+std_weights = std(contour_data.weights);
 
 if strcmp(variant_switch,'toutios2015factor')
     Dnorm=(D-mean_data)./std_data;
