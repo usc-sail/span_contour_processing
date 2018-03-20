@@ -128,7 +128,33 @@ for i=1:n
     vel(i,:) = J*Pvel*dwdt(i,:)';
 end
 
-contour_data.strategies = struct('jaw',jaw,'lip',lip,'tng',tng,'vel',vel);
+key_file_name = fullfile(config_struct.manual_annotations_path,'task_variable_key.csv');
+try
+    tab = readtable(key_file_name,'Delimiter',',');
+catch
+    warning('No task variable key %s',key_file_name)
+end
+
+biomarker = [];
+if exist('tab','var')
+    file_names = table2cell(tab(:,1));
+    task_variable = table2array(tab(:,2));
+    biomarker = zeros(size(tab,1),1);
+    for i=1:size(tab,1)
+        idx = find(cellfun(@(x) strcmp(file_names(i),x),contour_data.file_list));
+        if task_variable(i) == 1 % lips
+            biomarker(i) = diff(quantile(cumsum(jaw(contour_data.files==idx,task_variable(i))),[0.1 0.9])) ...
+                / diff(quantile(cumsum(jaw(contour_data.files==idx,task_variable(i)) ...
+                + lip(contour_data.files==idx,task_variable(i))),[0.1 0.9]));
+        else % tongue
+            biomarker(i) = diff(quantile(cumsum(jaw(contour_data.files==idx,task_variable(i))),[0.1 0.9])) ...
+                / diff(quantile(cumsum(jaw(contour_data.files==idx,task_variable(i)) ...
+                + tng(contour_data.files==idx,task_variable(i))),[0.1 0.9]));
+        end
+    end
+end
+
+contour_data.strategies = struct('jaw',jaw,'lip',lip,'tng',tng,'vel',vel,'biomarker',biomarker);
 
 save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
 
