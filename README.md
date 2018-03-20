@@ -31,10 +31,9 @@ Los Angeles, CA
 
 ## Demo
 
-Execute the demo with the Bash commands
+Execute the demo with the Bash command
 
 ```bash
-cd demo
 ./demo/run.sh
 ```
 
