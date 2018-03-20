@@ -4,4 +4,4 @@ wget --output-document download.zip http://span.usc.edu/owncloud/index.php/s/JNj
 unzip download.zip
 rm download.zip
 
-matlab -nodesktop ./demo/main.m
+#matlab -nodesktop -r "run main.m; exit"
