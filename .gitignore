@@ -5,9 +5,6 @@ demo/span_contour_processing_demo/
 # ignore data and graphics
 *.mat
 *.pdf
-*.png
-*.jpg
-*.jpeg
 *.avi
 *.mp3
 *.mp4

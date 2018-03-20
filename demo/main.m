@@ -7,7 +7,7 @@
 % 03/16/2018
 
 % add to path the functions called during the analysis
-addpath(genpath('../functions'))
+addpath(genpath(fullfile('..','functions')))
 
 % set the constant parameters of the analysis
 config_struct = config;
