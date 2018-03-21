@@ -1,4 +1,4 @@
-function strategies = get_strategies(config_struct,q)
+function get_strategies(config_struct,q)
 % GETSTRATEGIES - get strategies
 % 
 % INPUT: 
@@ -70,7 +70,7 @@ function strategies = get_strategies(config_struct,q)
 % Dec. 20, 2016
 
 % Load contour data, constriction degree measurements, and factors
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
 
 % Get weights.
 X = [contour_data.X, contour_data.Y];
@@ -163,12 +163,12 @@ try
             for k=1:length(file_nums)
                 if task_variable_num_ids(i) == 1 % compute jaw/(jaw+lips)
                     bm = diff(quantile(cumsum(jaw(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9])) ...
-                        / diff(quantile(cumsum(jaw(contour_data.files==file_nums(k),task_variable_num_ids(i)) ...
-                        + lip(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9]));
+                        / (diff(quantile(cumsum(jaw(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9])) ...
+                        + diff(quantile(cumsum(lip(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9])));
                 else % compute jaw/(jaw+tongue)
                     bm = diff(quantile(cumsum(jaw(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9])) ...
-                        / diff(quantile(cumsum(jaw(contour_data.files==file_nums(k),task_variable_num_ids(i)) ...
-                        + lip(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9]));
+                        / (diff(quantile(cumsum(jaw(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9])) ...
+                        + diff(quantile(cumsum(tng(contour_data.files==file_nums(k),task_variable_num_ids(i))),[0.1 0.9])));
                 end
                 bms(k) = bm;
             end
@@ -186,6 +186,6 @@ end
 
 contour_data.strategies = struct('jaw',jaw,'lip',lip,'tng',tng,'vel',vel,'biomarker',biomarker);
 
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
 
 end

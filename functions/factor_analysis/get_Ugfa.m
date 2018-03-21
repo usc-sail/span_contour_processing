@@ -102,7 +102,7 @@ end
 
 disp('Performing guided factor analysis')
 
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
 
 d = size(contour_data.X,2);
     
@@ -161,6 +161,6 @@ if sim_switch == true
         / sum(var([contour_data.X(:,idx),contour_data.Y(:,idx)]));
 end
 
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
 
 end

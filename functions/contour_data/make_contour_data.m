@@ -137,6 +137,6 @@ Y(:,sections_id==11) = repmat(mean(Y(:,sections_id==11),1),length(files),1);
 contour_data = struct('X',X,'Y',Y,...
     'files',files,'file_list',{file_list},'sections_id',sections_id','frames',frames,'video_frames',video_frames);
 
-save(fullfile(path_out,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
 
 end

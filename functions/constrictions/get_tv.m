@@ -131,7 +131,7 @@ else
 end
 
 % load articulator contours in the structured array contour_data
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)))
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
 
 % make articulator contours denser by a factor of six
 ds = 1/6;
@@ -204,4 +204,4 @@ contour_data.(tv_label){5}.cd=phar; contour_data.(tv_label){5}.in=[tng4_x; tng4_
 contour_data.(tv_label){6}.cd=vp;   contour_data.(tv_label){6}.in=[vel2_x; vel2_y]'; contour_data.(tv_label){6}.out=[phar2_x; phar2_y]';
 
 % update contour_data to contain TV
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel%d_lar%d.mat',q.jaw,q.tng,q.lip,q.vel,q.lar)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
