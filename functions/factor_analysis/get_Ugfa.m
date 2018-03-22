@@ -78,55 +78,47 @@ function get_Ugfa(config_struct,varargin)
 
 if nargin<2
     variant_switch = 'toutios2015factor';
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
     sim_switch = false;
 elseif nargin==2
     variant_switch = varargin{1};
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
     sim_switch = false;
 elseif nargin==3
     variant_switch = varargin{1};
-    q = varargin{2};
-    sim_switch = false;
-elseif nargin==4
-    variant_switch = varargin{1};
-    q = varargin{2};
-    sim_switch = varargin{3};
+    sim_switch = varargin{2};
 else
     variant_switch = 'toutios2015factor';
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
     sim_switch = false;
     warning(['Function get_Ugfa.m was called with %d input arguments,' ...
-        ' but requires 1 (optionally 2, 3, or 4)'],nargin)
+        ' but requires 1 (optionally 2 or 3)'],nargin)
 end
 
 disp('Performing guided factor analysis')
 
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
 d = size(contour_data.X,2);
     
 U_gfa=zeros(2*d,10);
 
 U_jaw = get_Ujaw(contour_data,variant_switch);
-idx = 1:q.jaw;
-U_gfa(:,idx)=U_jaw(:,1:q.jaw);
+idx = 1:config_struct.q.jaw;
+U_gfa(:,idx)=U_jaw(:,1:config_struct.q.jaw);
 
-U_tng = get_Utng(contour_data,U_jaw(:,1:q.jaw),variant_switch);
-idx = (q.jaw+1):(q.jaw+q.tng);
-U_gfa(:,idx)=U_tng(:,1:q.tng);
+U_tng = get_Utng(contour_data,U_jaw(:,1:config_struct.q.jaw),variant_switch);
+idx = (config_struct.q.jaw+1):(config_struct.q.jaw+config_struct.q.tng);
+U_gfa(:,idx)=U_tng(:,1:config_struct.q.tng);
 
-U_lip = get_Ulip(contour_data,U_jaw(:,1:q.jaw),variant_switch);
-idx = (q.jaw+q.tng+1):(q.jaw+q.tng+q.lip);
-U_gfa(:,idx)=U_lip(:,1:q.lip);
+U_lip = get_Ulip(contour_data,U_jaw(:,1:config_struct.q.jaw),variant_switch);
+idx = (config_struct.q.jaw+config_struct.q.tng+1):(config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip);
+U_gfa(:,idx)=U_lip(:,1:config_struct.q.lip);
 
-U_vel = get_Uvel(contour_data,U_jaw(:,1:q.jaw),variant_switch);
-idx = (q.jaw+q.tng+q.lip+1):(q.jaw+q.tng+q.lip+q.vel);
-U_gfa(:,idx)=U_vel(:,1:q.vel);
+U_vel = get_Uvel(contour_data,U_jaw(:,1:config_struct.q.jaw),variant_switch);
+idx = (config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip+1):(config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip+config_struct.q.vel);
+U_gfa(:,idx)=U_vel(:,1:config_struct.q.vel);
 
-U_lar = get_Ular(contour_data,U_jaw(:,1:q.jaw),variant_switch);
-idx = (q.jaw+q.tng+q.lip+q.vel+1):(q.jaw+q.tng+q.lip+q.vel+q.lar);
-U_gfa(:,idx)=U_lar(:,1:q.lar);
+U_lar = get_Ular(contour_data,U_jaw(:,1:config_struct.q.jaw),variant_switch);
+idx = (config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip+config_struct.q.vel+1):(config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip+config_struct.q.vel+config_struct.q.lar);
+U_gfa(:,idx)=U_lar(:,1:config_struct.q.lar);
 
 D = [contour_data.X,contour_data.Y];
 mean_data=ones(size(D,1),1)*mean(D);
@@ -161,6 +153,6 @@ if sim_switch == true
         / sum(var([contour_data.X(:,idx),contour_data.Y(:,idx)]));
 end
 
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
 end

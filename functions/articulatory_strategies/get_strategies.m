@@ -1,4 +1,4 @@
-function get_strategies(config_struct,q)
+function get_strategies(config_struct)
 % GETSTRATEGIES - get strategies
 % 
 % INPUT: 
@@ -70,7 +70,7 @@ function get_strategies(config_struct,q)
 % Dec. 20, 2016
 
 % Load contour data, constriction degree measurements, and factors
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
 % Get weights.
 X = [contour_data.X, contour_data.Y];
@@ -95,10 +95,10 @@ fn = round(config_struct.f*n);
 [idx, dist] = knnsearch(W,W,'dist','euclidean','K',fn);
 
 % Initialize constants.
-jaw_idxs = 1:q.jaw;
-tng_idxs = (q.jaw+1):(q.jaw+q.tng);
-lip_idxs = (q.jaw+q.tng+1):(q.jaw+q.tng+q.lip);
-vel_idxs = (q.jaw+q.tng+q.lip+1):(q.jaw+q.tng+q.lip+q.vel);
+jaw_idxs = 1:config_struct.q.jaw;
+tng_idxs = (config_struct.q.jaw+1):(config_struct.q.jaw+config_struct.q.tng);
+lip_idxs = (config_struct.q.jaw+config_struct.q.tng+1):(config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip);
+vel_idxs = (config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip+1):(config_struct.q.jaw+config_struct.q.tng+config_struct.q.lip+config_struct.q.vel);
 Pjaw = zeros(nw);
 Pjaw(jaw_idxs,jaw_idxs) = eye(length(jaw_idxs));
 Ptng = zeros(nw);
@@ -186,6 +186,6 @@ end
 
 contour_data.strategies = struct('jaw',jaw,'lip',lip,'tng',tng,'vel',vel,'biomarker',biomarker);
 
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
 end

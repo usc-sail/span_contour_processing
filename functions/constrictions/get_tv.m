@@ -108,30 +108,23 @@ function get_tv(config_struct,varargin)
 
 if nargin < 2
     sim_switch = false;
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
     phar_idx = [];
 elseif nargin == 2
     sim_switch = varargin{1};
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
     phar_idx = [];
 elseif nargin == 3
     sim_switch = varargin{1};
-    q = varargin{2};
-    phar_idx = [];
-elseif nargin == 4
-    sim_switch = varargin{1};
-    q = varargin{2};
-    phar_idx = varargin{3};
+    phar_idx = varargin{2};
 else
     sim_switch = false;
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
     phar_idx = [];
     warning(['Function get_tv.m was called with %d input arguments,' ...
-        ' but requires 1 (optionally 2, 3, or 4)'],nargin)
+        ' but requires 1 (optionally 2 or 3)'],nargin)
 end
 
 % load articulator contours in the structured array contour_data
-load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',...
+    config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
 % make articulator contours denser by a factor of six
 ds = 1/6;
@@ -204,4 +197,5 @@ contour_data.(tv_label){5}.cd=phar; contour_data.(tv_label){5}.in=[tng4_x; tng4_
 contour_data.(tv_label){6}.cd=vp;   contour_data.(tv_label){6}.in=[vel2_x; vel2_y]'; contour_data.(tv_label){6}.out=[phar2_x; phar2_y]';
 
 % update contour_data to contain TV
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',...
+    config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')

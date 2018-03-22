@@ -1,4 +1,4 @@
-function make_contour_data(config_struct,varargin)
+function make_contour_data(config_struct)
 % MAKE_CONTOUR_DATA - intitialize the struct contour_data containing the 
 % contour vertices contained in all the track files in the directory 
 % config_struct.track_path. The struct contour_data is saved to file 
@@ -54,23 +54,10 @@ function make_contour_data(config_struct,varargin)
 % University of Southern California
 % 03/16/2018
 
-if nargin < 2
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
-elseif nargin == 2
-    q = varargin{1};
-else
-    q = struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2);
-    warning(['Function get_map.m was called with %d input arguments,' ...
-        ' but requires 1 (optionally 2)'],nargin)
-end
-
-path_in = config_struct.track_path;
-path_out = config_struct.out_path;
-
 fprintf('Making contour_data\n')
 file_format = '*.mat';  % file name pattern
 
-file_list = dir(fullfile(path_in,file_format));
+file_list = dir(fullfile(config_struct.track_path,file_format));
 file_list = {file_list.name};
 n_file = length(file_list);
 
@@ -82,7 +69,7 @@ for i=1:n_file
         fprintf('=')
     end
     
-    file = load(fullfile(path_in,file_list{i}));
+    file = load(fullfile(config_struct.track_path,file_list{i}));
     n_frame = length(file.trackdata);
     
     for j=1:n_frame
@@ -134,9 +121,10 @@ video_frames(ii)=[];
 X(:,sections_id==11) = repmat(mean(X(:,sections_id==11),1),length(files),1);
 Y(:,sections_id==11) = repmat(mean(Y(:,sections_id==11),1),length(files),1);
 
-contour_data = struct('X',X,'Y',Y,...
-    'files',files,'file_list',{file_list},'sections_id',sections_id','frames',frames,'video_frames',video_frames);
+contour_data = struct('X',X,'Y',Y,'files',files,'file_list',{file_list},...
+    'sections_id',sections_id','frames',frames,'video_frames',video_frames);
 
-save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',q.jaw,q.tng,q.lip,100*config_struct.f)),'contour_data')
+save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',...
+    config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
 end
