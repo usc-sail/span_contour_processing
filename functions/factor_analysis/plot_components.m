@@ -44,6 +44,8 @@ for j=1:(q.jaw+q.tng+q.lip+q.vel+q.lar);  % component under examination
     axis([-40 20 -30 30]); axis off;
 
     print(fullfile(config_struct.out_path,sprintf('factor_%d_jaw%d_tng%d_lip%d_vel%d_lar%d.pdf',j,q.jaw,q.tng,q.lip,q.vel,q.lar)),'-dpdf')
+    
+    close all
 end
 
 
