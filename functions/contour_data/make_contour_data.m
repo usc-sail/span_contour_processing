@@ -125,6 +125,6 @@ contour_data = struct('X',X,'Y',Y,'files',files,'file_list',{file_list},...
     'sections_id',sections_id','frames',frames,'video_frames',video_frames);
 
 save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',...
-    config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
+    config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,round(100*config_struct.f))),'contour_data')
 
 end
