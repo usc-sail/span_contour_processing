@@ -72,6 +72,8 @@ function get_strategies(config_struct)
 % Load contour data, constriction degree measurements, and factors
 load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
 
+disp('Computing articulator strategies')
+
 % Get weights.
 X = [contour_data.X, contour_data.Y];
 X = X - mean(X);

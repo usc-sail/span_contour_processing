@@ -25,13 +25,6 @@ function get_tv(config_struct,varargin)
 %    (false) or using the (x,y)-coordinates of articulator contours that
 %    have been projected onto the column space of the factors (true).
 % 
-%  Variable name: q
-%  Size: 1x1
-%  Class: struct
-%  Default value: struct('jaw',1,'tng',4,'lip',2,'vel',1,'lar',2)
-%  Description: struct array that indicates the number of factors for the
-%    jaw, tongue, lips, velum, and larynx.
-% 
 %  Variable name: phar_idx
 %  Size: 0x0 or 1x2
 %  Class: double
@@ -122,6 +115,12 @@ else
         ' but requires 1 (optionally 2 or 3)'],nargin)
 end
 
+if ~sim_switch
+    disp('Computing constriction degrees')
+else
+    disp('Computing simulated constriction degrees')
+end
+
 % load articulator contours in the structured array contour_data
 load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',...
     config_struct.q.jaw,config_struct.q.tng,config_struct.q.lip,100*config_struct.f)),'contour_data')
@@ -130,12 +129,12 @@ load(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel
 ds = 1/6;
 
 % initialize tv containers
-la=zeros(size(contour_data.X,1),1); ulx=la; uly=la; llx=la; lly=la;
-vp=la; velumx1=la; velumy1=la; pharynxx1=la; pharynxy1=la;
-alv=la; alveolarx=la; alveolary=la; tonguex2=la; tonguey2=la;
-pal=la; palatalx=la; palataly=la; tonguex3=la; tonguey3=la;
-vel=la; velumx2=la; velumy2=la; tonguex1=la; tonguey1=la;
-phar=la; pharynxx2=la; pharynxy2=la; tonguex4=la; tonguey4=la; 
+la=zeros(size(contour_data.X,1),1); ul_x=la; ul_y=la; ll_x=la; ll_y=la;
+alv=la; alv_x=la; alv_y=la; tng1_x=la; tng1_y=la;
+pal=la; pal_x=la; pal_y=la; tng2_x=la; tng2_y=la;
+vel=la; vel1_x=la; vel1_y=la; tng3_x=la; tng3_y=la;
+phar=la; phar1_x=la; phar1_y=la; tng4_x=la; tng4_y=la; 
+vp=la; vel2_x=la; vel2_y=la; phar2_x=la; phar2_y=la;
 
 % initialize index for tv containers
 k=1;
@@ -144,13 +143,6 @@ files = unique(contour_data.files);
 nFiles = length(files);
 
 for i=1:nFiles
-    % display progress
-    if ~sim_switch
-        disp(['Getting (original) TVs file ' num2str(i) ' of ' num2str(nFiles)])
-    else
-        disp(['Getting (simulated) TVs file ' num2str(i) ' of ' num2str(nFiles)])
-    end
-    
     % obtain frame numbers for the i-th file
     frames=contour_data.frames(contour_data.files==i);
     
