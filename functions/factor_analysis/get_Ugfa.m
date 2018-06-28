@@ -134,7 +134,7 @@ contour_data.U_gfa = U_gfa;
 contour_data.weights = weights;
 
 if config_struct.verbose
-    figure; plot_components(config_struct, contour_data, variant_switch, q);
+    figure; plot_components(config_struct, contour_data, variant_switch, config_struct.q);
 end
 
 if sim_switch == true

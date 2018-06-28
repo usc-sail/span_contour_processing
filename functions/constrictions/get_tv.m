@@ -142,7 +142,13 @@ k=1;
 files = unique(contour_data.files);
 nFiles = length(files);
 
+fprintf('[')
+twentieths = round(linspace(1,nFiles,20));
 for i=1:nFiles
+    if ismember(i,twentieths)
+        fprintf('=')
+    end
+    
     % obtain frame numbers for the i-th file
     frames=contour_data.frames(contour_data.files==i);
     
@@ -174,6 +180,7 @@ for i=1:nFiles
         k=k+1;
     end
 end
+fprintf(']\n')
 
 % save tv containers to contour_data
 if ~sim_switch
