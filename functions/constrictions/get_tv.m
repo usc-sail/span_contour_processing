@@ -145,6 +145,7 @@ nFiles = length(files);
 fprintf('[')
 twentieths = round(linspace(1,nFiles,20));
 for i=1:nFiles
+    % monitor progress
     if ismember(i,twentieths)
         fprintf('=')
     end

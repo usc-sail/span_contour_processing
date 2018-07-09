@@ -65,6 +65,7 @@ ell=1;
 fprintf('[')
 twentieths = round(linspace(1,n_file,20));
 for i=1:n_file
+    % monitor progress
     if ismember(i,twentieths)
         fprintf('=')
     end
