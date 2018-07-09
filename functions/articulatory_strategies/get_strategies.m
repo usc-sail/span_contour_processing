@@ -116,7 +116,14 @@ lip = zeros(n,nz);
 tng = zeros(n,nz);
 vel = zeros(n,nz);
 
+fprintf('[')
+twentieths = round(linspace(1,n,20));
 for i=1:n
+    % monitor progress
+    if ismember(i,twentieths)
+        fprintf('=')
+    end
+    
     % Estimate the jacobian J of the forward map at point w(i,:)
     G = lscov([ones(length(idx(i,:)),1) W(idx(i,:),:)], Z(idx(i,:),:), ...
         arrayfun(@(u) weight_fun(u), dist(i,:)./dist(i,end)));
@@ -129,6 +136,7 @@ for i=1:n
     tng(i,:) = J*Ptng*dwdt(i,:)';
     vel(i,:) = J*Pvel*dwdt(i,:)';
 end
+fprintf(']\n')
 
 % initialize task variable-file name associations
 biomarker = [];
