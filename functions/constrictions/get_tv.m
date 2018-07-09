@@ -188,12 +188,12 @@ if ~sim_switch
 else
     tv_label = 'tvsim';
 end
-contour_data.(tv_label){1}.cd=la;   contour_data.(tv_label){1}.in=[ll_x; ll_y]';     contour_data.(tv_label){1}.out=[ul_x; ul_y]';
-contour_data.(tv_label){2}.cd=alv;  contour_data.(tv_label){2}.in=[tng1_x; tng1_y]'; contour_data.(tv_label){2}.out=[alv_x; alv_y]';
-contour_data.(tv_label){3}.cd=pal;  contour_data.(tv_label){3}.in=[tng2_x; tng2_y]'; contour_data.(tv_label){3}.out=[pal_x; pal_y]';
-contour_data.(tv_label){4}.cd=vel;  contour_data.(tv_label){4}.in=[tng3_x; tng3_y]'; contour_data.(tv_label){4}.out=[vel1_x; vel1_y]';
-contour_data.(tv_label){5}.cd=phar; contour_data.(tv_label){5}.in=[tng4_x; tng4_y]'; contour_data.(tv_label){5}.out=[phar1_x; phar1_y]';
-contour_data.(tv_label){6}.cd=vp;   contour_data.(tv_label){6}.in=[vel2_x; vel2_y]'; contour_data.(tv_label){6}.out=[phar2_x; phar2_y]';
+contour_data.(tv_label){2}.constriction_location='bilabial_place';      contour_data.(tv_label){1}.cd=la;   contour_data.(tv_label){1}.in=[ll_x; ll_y]';     contour_data.(tv_label){1}.out=[ul_x; ul_y]';
+contour_data.(tv_label){2}.constriction_location='alveolar_place';      contour_data.(tv_label){2}.cd=alv;  contour_data.(tv_label){2}.in=[tng1_x; tng1_y]'; contour_data.(tv_label){2}.out=[alv_x; alv_y]';
+contour_data.(tv_label){3}.constriction_location='palatal_place';       contour_data.(tv_label){3}.cd=pal;  contour_data.(tv_label){3}.in=[tng2_x; tng2_y]'; contour_data.(tv_label){3}.out=[pal_x; pal_y]';
+contour_data.(tv_label){4}.constriction_location='velar_place';         contour_data.(tv_label){4}.cd=vel;  contour_data.(tv_label){4}.in=[tng3_x; tng3_y]'; contour_data.(tv_label){4}.out=[vel1_x; vel1_y]';
+contour_data.(tv_label){5}.constriction_location='pharyngeal_place';    contour_data.(tv_label){5}.cd=phar; contour_data.(tv_label){5}.in=[tng4_x; tng4_y]'; contour_data.(tv_label){5}.out=[phar1_x; phar1_y]';
+contour_data.(tv_label){6}.constriction_location='velopharyngeal_port'; contour_data.(tv_label){6}.cd=vp;   contour_data.(tv_label){6}.in=[vel2_x; vel2_y]'; contour_data.(tv_label){6}.out=[phar2_x; phar2_y]';
 
 % update contour_data to contain TV
 save(fullfile(config_struct.out_path,sprintf('contour_data_jaw%d_tng%d_lip%d_vel1_lar2_f%d.mat',...
